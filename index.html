@@ -1,0 +1,805 @@
+<!DOCTYPE html>
+<html lang="ko" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>입법예고 대시보드</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
+
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        gray: {
+                            750: '#2d2d2d',
+                            850: '#1a1a1a',
+                            900: '#121212',
+                            950: '#0a0a0a',
+                        },
+                        purple: {
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        /* Custom scrollbar for dark theme */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #1e1e1e; 
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #4b5563; 
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #6b7280; 
+        }
+        .markdown-body h1 { font-size: 1.5rem; font-weight: bold; margin-top: 1.5rem; margin-bottom: 1rem; color: #e5e7eb; }
+        .markdown-body h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1.2rem; margin-bottom: 0.8rem; color: #e5e7eb; }
+        .markdown-body h3 { font-size: 1.1rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.6rem; color: #e5e7eb; }
+        .markdown-body p { margin-bottom: 1rem; line-height: 1.6; color: #d1d5db; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid #374151; padding: 0.5rem; color: #d1d5db; }
+        .markdown-body th { background-color: #1f2937; }
+        .markdown-body ul, .markdown-body ol { margin-bottom: 1rem; padding-left: 1.5rem; list-style-type: disc; color: #d1d5db; }
+        /* Style for HTML-based content (converted HWPX) */
+        .markdown-body > div { margin-bottom: 1rem; line-height: 1.6; color: #d1d5db; }
+    </style>
+</head>
+<body class="bg-[#121212] text-gray-100 font-sans antialiased overflow-hidden"
+      x-data="{ 
+          sidebarOpen: false, 
+          selectedPost: null,
+          loading: false,
+          draftContent: '',
+          reasonContent: '',
+          activeTab: 'draft',
+          sidebarWidth: 900,
+          isResizing: false,
+          startX: 0,
+          startWidth: 0,
+
+          async fetchDetail(id) {
+              this.loading = true;
+              this.draftContent = '';
+              this.reasonContent = '';
+              try {
+                  const res = await fetch(`data/${id}.json`);
+                  const data = await res.json();
+                  this.draftContent = data.draft;
+                  this.reasonContent = data.reason;
+              } catch(e) {
+                  console.error(e);
+                  this.draftContent = '<p>내용을 불러오는데 실패했습니다.</p>';
+              } finally {
+                  this.loading = false;
+              }
+          },
+          selectPost(post) {
+              this.selectedPost = post;
+              this.sidebarOpen = true;
+              this.fetchDetail(post.id);
+          },
+          startResize(e) {
+              this.isResizing = true;
+              this.startX = e.clientX;
+              this.startWidth = this.sidebarWidth;
+              document.body.style.cursor = 'ew-resize';
+              document.body.style.userSelect = 'none';
+          },
+          performResize(e) {
+              if (!this.isResizing) return;
+              // Dragging left increases width (since sidebar is on the right)
+              const delta = this.startX - e.clientX;
+              const newWidth = this.startWidth + delta;
+              // Constrain width (min 400px, max 90vw)
+              if (newWidth > 400 && newWidth < window.innerWidth * 0.9) {
+                  this.sidebarWidth = newWidth;
+              }
+          },
+          stopResize() {
+              this.isResizing = false;
+              document.body.style.cursor = '';
+              document.body.style.userSelect = '';
+          }
+      }"
+      @mousemove.window="performResize($event)"
+      @mouseup.window="stopResize()">
+
+    <div class="flex h-screen">
+        <!-- [Left] Sidebar Navigation -->
+        <aside class="w-64 bg-[#1e1e1e] border-r border-gray-800 flex-shrink-0 hidden md:flex flex-col">
+            <div class="p-6 flex items-center space-x-3">
+                <div class="w-8 h-8 bg-purple-500 rounded-lg flex items-center justify-center">
+                    <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 6l3 1m0 0l-3 9a5.002 5.002 0 006.001 0M6 7l3 9M6 7l6-2m6 2l3-1m-3 1l-3 9a5.002 5.002 0 006.001 0M18 7l3 9m-3-9l-6-2m0-2v2m0 16V5m0 16H9m3 0h3"></path></svg>
+                </div>
+                <span class="text-xl font-bold tracking-tight">LegalWard</span>
+            </div>
+
+            <nav class="flex-1 px-4 space-y-2 overflow-y-auto">
+                <a href="#" class="flex items-center px-4 py-3 bg-gray-800 text-white rounded-xl transition-colors">
+                    <svg class="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
+                    (부처)입법예고
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    (부처)행정예고
+                </a>
+                <a href="#" class="flex items-center px-4 py-3 text-gray-400 hover:bg-gray-800 hover:text-white rounded-xl transition-colors">
+                    <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3.055 11H5a2 2 0 012 2v1a2 2 0 002 2 2 2 0 012 2v2.945M8 3.935V5.5A2.5 2.5 0 0010.5 8h.5a2 2 0 012 2 2 2 0 104 0 2 2 0 012-2h1.064M15 20.488V18a2 2 0 012-2h3.064M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    (지방)입법예고
+                </a>
+            </nav>
+            
+            <div class="p-4 border-t border-gray-800">
+                <div class="flex items-center">
+                     <div class="w-8 h-8 rounded-full bg-gray-600 flex items-center justify-center text-sm font-bold">U</div>
+                     <div class="ml-3">
+                         <p class="text-sm font-medium text-white">사용자</p>
+                         <p class="text-xs text-gray-500">user@example.com</p>
+                     </div>
+                </div>
+            </div>
+        </aside>
+
+        <!-- [Center] Main Feed -->
+        <main class="flex-1 flex flex-col min-w-0 overflow-hidden bg-[#121212]">
+            <!-- Header -->
+            <header class="h-16 flex items-center justify-between px-6 border-b border-gray-800 bg-[#121212] sticky top-0 z-10">
+                <div class="flex items-center flex-1">
+                    <div class="relative w-full max-w-md">
+                        <input type="text" placeholder="관심있는 법안 검색..." class="w-full bg-[#1e1e1e] border border-gray-700 text-gray-300 text-sm rounded-full focus:ring-purple-500 focus:border-purple-500 block pl-10 p-2.5 placeholder-gray-500">
+                        <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
+                            <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+                        </div>
+                    </div>
+                </div>
+                <div class="flex items-center space-x-4">
+                    <button class="text-gray-400 hover:text-white relative">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9"></path></svg>
+                        <span class="absolute top-0 right-0 block h-2 w-2 rounded-full ring-2 ring-[#121212] bg-red-500"></span>
+                    </button>
+                </div>
+            </header>
+
+            <!-- Scrollable Content -->
+            <div class="flex-1 overflow-y-auto p-6 space-y-4">
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '160', 'title': '개발제한구역의 지정 및 관리에 관한 특별조치법 일부개정령안 입법예고일부', 'category': '국토개발ㆍ도시', 'author': '국토교통부(대통령령)', 'period': '2025. 12. 1.~2026. 1. 12.', 'views': '1,102', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84574?pageIndex=1', 'upvotes': 11, 'downvotes': 2})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 11</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#160</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">국토개발ㆍ도시</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">국토교통부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2026. 1. 12.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">개발제한구역의 지정 및 관리에 관한 특별조치법 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '159', 'title': '증권거래세법 시행령 일부개정령안 입법예고일부', 'category': '내국세', 'author': '기획재정부(대통령령)', 'period': '2025. 12. 1.~2025. 12. 15.', 'views': '1,103', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84572?pageIndex=1', 'upvotes': 11, 'downvotes': 2})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 11</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#159</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">내국세</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">기획재정부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2025. 12. 15.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">증권거래세법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '158', 'title': '소득세법 시행령 일부개정령안 입법예고일부', 'category': '내국세', 'author': '기획재정부(대통령령)', 'period': '2025. 12. 1.~2025. 12. 15.', 'views': '1,147', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84570?pageIndex=1', 'upvotes': 11, 'downvotes': 2})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 11</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#158</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">내국세</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">기획재정부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2025. 12. 15.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">소득세법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '157', 'title': '풍수해·지진재해보험법 시행령 일부개정령안 입법예고일부', 'category': '민방위ㆍ소방', 'author': '행정안전부(대통령령)', 'period': '2025. 12. 1.~2026. 1. 12.', 'views': '910', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84568?pageIndex=1', 'upvotes': 9, 'downvotes': 1})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 9</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 1</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#157</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">민방위ㆍ소방</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">행정안전부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2026. 1. 12.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">풍수해·지진재해보험법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '156', 'title': '도로교통법 시행령 일부개정령안 입법예고일부', 'category': '경찰', 'author': '경찰청(대통령령)', 'period': '2025. 12. 1.~2026. 1. 12.', 'views': '1,046', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84566?pageIndex=1', 'upvotes': 10, 'downvotes': 2})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 10</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#156</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">경찰</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">경찰청(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2026. 1. 12.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">도로교통법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '155', 'title': '도로교통법 시행규칙 일부개정령안 입법예고일부', 'category': '경찰', 'author': '경찰청(부령)', 'period': '2025. 12. 1.~2026. 1. 12.', 'views': '1,055', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84564?pageIndex=1', 'upvotes': 10, 'downvotes': 2})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 10</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 2</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#155</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">경찰</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">경찰청(부령)</span>
+                            <span>•</span>
+                            <span>2025. 12. 1.~2026. 1. 12.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">도로교통법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '154', 'title': '행정업무의 운영 및 혁신에 관한 규정 일부개정령안 입법예고일부', 'category': '행정일반', 'author': '행정안전부(대통령령)', 'period': '2025. 11. 28.~2025. 12. 8.', 'views': '8,020', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84620?pageIndex=1', 'upvotes': 80, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 80</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#154</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">행정일반</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">행정안전부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2025. 12. 8.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">행정업무의 운영 및 혁신에 관한 규정 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '153', 'title': '초·중등교육법 시행규칙 일부개정령안 입법예고일부', 'category': '교육ㆍ학술', 'author': '교육부(부령)', 'period': '2025. 11. 28.~2026. 1. 8.', 'views': '8,394', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84618?pageIndex=1', 'upvotes': 83, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 83</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#153</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">교육ㆍ학술</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">교육부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 8.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">초·중등교육법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '152', 'title': '산림청과 그 소속기관 직제 시행규칙 일부개정령안 입법예고일부', 'category': '산림', 'author': '산림청(부령)', 'period': '2025. 11. 28.~2025. 12. 5.', 'views': '8,001', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84622?pageIndex=1', 'upvotes': 80, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 80</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#152</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">산림</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">산림청(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2025. 12. 5.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">산림청과 그 소속기관 직제 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '151', 'title': '근로복지기본법 시행령 일부개정령안 입법예고일부', 'category': '노동', 'author': '고용노동부(대통령령)', 'period': '2025. 11. 28.~2026. 1. 7.', 'views': '8,704', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84616?pageIndex=1', 'upvotes': 87, 'downvotes': 17})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 87</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 17</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#151</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">노동</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">고용노동부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 7.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">근로복지기본법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '150', 'title': '근로복지기본법 시행규칙 일부개정령안 입법예고일부', 'category': '노동', 'author': '고용노동부(부령)', 'period': '2025. 11. 28.~2026. 1. 7.', 'views': '8,347', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84614?pageIndex=1', 'upvotes': 83, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 83</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#150</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">노동</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">고용노동부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 7.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">근로복지기본법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '149', 'title': '양봉산업의 육성 및 지원에 관한 법률 시행규칙 일부개정령안 입법예고일부', 'category': '축산', 'author': '농림축산식품부(부령)', 'period': '2025. 11. 28.~2026. 1. 8.', 'views': '8,197', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84624?pageIndex=1', 'upvotes': 81, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 81</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#149</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">축산</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">농림축산식품부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 8.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">양봉산업의 육성 및 지원에 관한 법률 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '148', 'title': '중소기업창업 지원법 시행규칙 일부개정령안 입법예고일부', 'category': '상업ㆍ무역ㆍ공업', 'author': '중소벤처기업부(부령)', 'period': '2025. 11. 28.~2025. 12. 23.', 'views': '8,045', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84612?pageIndex=1', 'upvotes': 80, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 80</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#148</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">상업ㆍ무역ㆍ공업</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">중소벤처기업부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2025. 12. 23.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">중소기업창업 지원법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '147', 'title': '약사법 시행령 일부개정령안 입법예고일부', 'category': '약사', 'author': '보건복지부(대통령령)', 'period': '2025. 11. 28.~2026. 1. 7.', 'views': '8,208', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84610?pageIndex=1', 'upvotes': 82, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 82</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#147</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">약사</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">보건복지부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 7.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">약사법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '146', 'title': '의료기기 유통 및 판매질서 유지에 관한 규칙 일부개정령안 입법예고일부', 'category': '보건ㆍ의사', 'author': '보건복지부(부령)', 'period': '2025. 11. 28.~2026. 1. 7.', 'views': '8,808', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84608?pageIndex=1', 'upvotes': 88, 'downvotes': 17})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 88</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 17</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#146</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">보건ㆍ의사</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">보건복지부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 7.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">의료기기 유통 및 판매질서 유지에 관한 규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '145', 'title': '약사법 시행규칙 일부개정령안 입법예고일부', 'category': '약사', 'author': '보건복지부(부령)', 'period': '2025. 11. 28.~2026. 1. 7.', 'views': '8,096', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84606?pageIndex=1', 'upvotes': 80, 'downvotes': 16})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 80</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 16</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#145</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">약사</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">보건복지부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 28.~2026. 1. 7.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">약사법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '144', 'title': '해양환경관리법 시행령 일부개정령안 입법예고일부', 'category': '환경', 'author': '해양수산부(대통령령)', 'period': '2025. 11. 27.~2026. 1. 6.', 'views': '9,561', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84604?pageIndex=1', 'upvotes': 95, 'downvotes': 19})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 95</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 19</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#144</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">환경</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">해양수산부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 27.~2026. 1. 6.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">해양환경관리법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '143', 'title': '해양환경관리법 시행규칙 일부개정령안 입법예고일부', 'category': '환경', 'author': '해양수산부(부령)', 'period': '2025. 11. 27.~2026. 1. 6.', 'views': '10,436', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84562?pageIndex=1', 'upvotes': 104, 'downvotes': 20})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 104</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 20</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#143</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">환경</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">해양수산부(부령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 27.~2026. 1. 6.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">해양환경관리법 시행규칙 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '142', 'title': '규제일몰 해제 등을 위한 방문판매 등에 관한 법률 시행규칙 일부개정안 입법예고일부', 'category': '', 'author': '공정거래위원회(총리령)', 'period': '2025. 11. 27.~2026. 1. 6.', 'views': '8,949', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84560?pageIndex=1', 'upvotes': 89, 'downvotes': 17})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 89</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 17</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#142</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700"></span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">공정거래위원회(총리령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 27.~2026. 1. 6.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">규제일몰 해제 등을 위한 방문판매 등에 관한 법률 시행규칙 일부개정안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                <!-- Post Item -->
+                <div @click="selectPost({'id': '141', 'title': '영유아보육법 시행령 일부개정령안 입법예고일부', 'category': '사회복지', 'author': '교육부(대통령령)', 'period': '2025. 11. 27.~2026. 1. 6.', 'views': '10,480', 'link': 'https://opinion.lawmaking.go.kr/gcom/ogLmPp/84558?pageIndex=1', 'upvotes': 104, 'downvotes': 20})" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
+                    <!-- Vote Box -->
+                    <div class="flex flex-col items-center justify-center mr-5 min-w-[60px]">
+                        <div class="bg-gray-800 rounded-xl w-14 py-2 flex flex-col items-center space-y-1 group-hover:bg-gray-700 transition-colors">
+                            <span class="text-purple-400 text-xs font-bold">▲ 104</span>
+                            <div class="w-8 h-[1px] bg-gray-600"></div>
+                            <span class="text-gray-500 text-xs font-bold">▼ 20</span>
+                        </div>
+                    </div>
+
+                    <!-- Content -->
+                    <div class="flex-1 min-w-0 py-1">
+                        <div class="flex items-center text-xs text-gray-500 mb-1 space-x-2">
+                            <span class="text-purple-400 font-bold">#141</span>
+                            <span>•</span>
+                            <span class="bg-gray-800 px-2 py-0.5 rounded text-gray-400 border border-gray-700">사회복지</span>
+                            <span>•</span>
+                            <span class="text-gray-400 font-medium">교육부(대통령령)</span>
+                            <span>•</span>
+                            <span>2025. 11. 27.~2026. 1. 6.</span>
+                        </div>
+                        <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors">영유아보육법 시행령 일부개정령안 입법예고일부</h3>
+                        <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                    </div>
+                </div>
+                
+                
+                <!-- Bottom Spacer -->
+                <div class="h-20"></div>
+            </div>
+        </main>
+
+        <!-- [Right] Sliding Sidebar (Resizable) -->
+        <div x-show="sidebarOpen" 
+             :style="window.innerWidth >= 768 ? 'width: ' + sidebarWidth + 'px' : ''"
+             class="fixed inset-y-0 right-0 w-full bg-[#1e1e1e] border-l border-gray-700 shadow-2xl z-50 transform transition-transform duration-300 ease-in-out flex flex-row"
+             x-transition:enter="translate-x-full"
+             x-transition:enter-start="translate-x-full"
+             x-transition:enter-end="translate-x-0"
+             x-transition:leave="translate-x-0"
+             x-transition:leave-start="translate-x-0"
+             x-transition:leave-end="translate-x-full"
+             style="display: none;">
+             
+             <!-- Resizer Handle -->
+             <div class="w-1.5 hover:w-2 bg-transparent hover:bg-purple-500 cursor-ew-resize absolute left-0 top-0 bottom-0 -ml-0.5 z-50 transition-all hidden md:block opacity-0 hover:opacity-100 bg-opacity-50"
+                  @mousedown="startResize($event)">
+             </div>
+
+             <!-- Sidebar Content Wrapper -->
+             <div class="flex-1 flex flex-col min-w-0 h-full w-full">
+                <!-- Sidebar Header -->
+                <div class="px-6 py-4 border-b border-gray-700 flex items-center justify-between bg-[#1a1a1a] flex-shrink-0">
+                    <div class="flex items-center space-x-3 overflow-hidden">
+                        <span class="bg-purple-900 text-purple-200 text-xs font-bold px-2 py-1 rounded" x-text="selectedPost?.category"></span>
+                        <h2 class="text-lg font-bold text-white truncate" x-text="selectedPost?.title"></h2>
+                    </div>
+                    <button @click="sidebarOpen = false" class="text-gray-400 hover:text-white p-1 rounded-lg hover:bg-gray-700 transition-colors">
+                        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                    </button>
+                </div>
+
+                <!-- Sidebar Tabs -->
+                <div class="flex border-b border-gray-700 bg-[#1e1e1e] flex-shrink-0">
+                    <button @click="activeTab = 'draft'" 
+                            :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'draft', 'text-gray-400 hover:text-gray-200': activeTab !== 'draft' }"
+                            class="flex-1 py-3 text-sm font-medium transition-colors">
+                        법령안 (Draft)
+                    </button>
+                    <button @click="activeTab = 'reason'" 
+                            :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'reason', 'text-gray-400 hover:text-gray-200': activeTab !== 'reason' }"
+                            class="flex-1 py-3 text-sm font-medium transition-colors">
+                        제개정 이유서 (Reason)
+                    </button>
+                </div>
+
+                <!-- Sidebar Content -->
+                <div class="flex-1 overflow-y-auto p-8 bg-[#121212]">
+                    <div x-show="loading" class="flex justify-center items-center h-32">
+                        <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                    </div>
+
+                    <div x-show="!loading && activeTab === 'draft'">
+                         <div class="markdown-body" x-html="draftContent"></div>
+                    </div>
+                    
+                    <div x-show="!loading && activeTab === 'reason'">
+                        <div class="markdown-body" x-html="reasonContent"></div>
+                    </div>
+                </div>
+                
+                <!-- Footer Actions -->
+                <div class="p-4 border-t border-gray-700 bg-[#1a1a1a] flex justify-between items-center flex-shrink-0">
+                    <a :href="selectedPost?.link" target="_blank" class="text-sm text-purple-400 hover:text-purple-300 hover:underline flex items-center">
+                        국민참여입법센터 원문 보기
+                        <svg class="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </a>
+                    <div class="flex space-x-2">
+                         <button class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors">공유하기</button>
+                         <button class="px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white rounded-lg text-sm font-medium transition-colors">의견 작성</button>
+                    </div>
+                </div>
+             </div>
+        </div>
+        
+        <!-- Overlay for mobile -->
+        <div x-show="sidebarOpen" @click="sidebarOpen = false" 
+             class="fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden"
+             x-transition.opacity></div>
+    </div>
+</body>
+</html>
