@@ -152,15 +152,17 @@
                             </template>
                         </select>
                     </div>
-                     <div class="pt-5">
-                        <button @click="resetFilters()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors">초기화</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Scrollable Content -->
-            <div class="flex-1 overflow-y-auto p-6 space-y-4">
-                <template x-for="post in filteredPosts" :key="post.id">
+                                          <div class="pt-5">
+                                             <button @click="resetFilters()" class="px-4 py-2 bg-gray-700 hover:bg-gray-600 text-white rounded-lg text-sm font-medium transition-colors">초기화</button>
+                                         </div>
+                                     </div>
+                                     <div class="mt-2 text-xs text-gray-500 text-right">
+                                         최종 업데이트: 
+                                     </div>
+                                 </div>
+                                 
+                                 <!-- Scrollable Content -->
+                                 <div class="flex-1 overflow-y-auto p-6 space-y-4">                <template x-for="post in filteredPosts" :key="post.id">
                     <!-- Post Item -->
                     <div @click="selectPost(post)" class="group flex bg-[#1e1e1e] hover:bg-gray-750 rounded-2xl p-4 cursor-pointer border border-transparent hover:border-gray-700 transition-all duration-200 shadow-sm">
                         <!-- Vote Box -->
