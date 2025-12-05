@@ -82,7 +82,7 @@
                 </div>
                 <div class="pl-1">
                     <p class="text-[10px] text-gray-500 font-medium tracking-wide">
-                        UPDATED: 2025. 12. 05. 16:59
+                        UPDATED: 2025. 12. 05. 17:01
                     </p>
                 </div>
             </div>
@@ -233,7 +233,14 @@
                                 <span class="w-full sm:w-auto mt-1 sm:mt-0 font-bold text-gray-300 tracking-wide" x-text="post.period"></span>
                             </div>
                             <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors" x-html="highlightMatch(post.title)"></h3>
-                            <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
+                            <p class="text-sm text-gray-400 truncate leading-relaxed">
+                                <template x-if="post.keywords && post.keywords.trim().length > 0">
+                                    <span class="font-medium text-gray-300">핵심어: </span><span class="text-gray-400" x-text="post.keywords.split(' ').slice(0, 5).join(', ')"></span>
+                                </template>
+                                <template x-if="!post.keywords || post.keywords.trim().length === 0">
+                                    <span class="text-gray-500">상세 내용을 확인하려면 클릭하세요.</span>
+                                </template>
+                            </p>
                         </div>
                     </div>
                 </template>
