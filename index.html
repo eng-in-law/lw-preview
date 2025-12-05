@@ -82,7 +82,7 @@
                 </div>
                 <div class="pl-1">
                     <p class="text-[10px] text-gray-500 font-medium tracking-wide">
-                        UPDATED: 2025. 12. 05. 16:44
+                        UPDATED: 2025. 12. 05. 16:49
                     </p>
                 </div>
             </div>
@@ -442,24 +442,31 @@
                     return text.replace(regex, '<span class="text-purple-400 underline">$1</span>');
                 },
 
-                // D-Day Helper Logic (Optimized)
+                // D-Day Helper Logic (Optimized & Date-based)
                 getDDay(post) {
-                    if (post.status === 'closed') return -1; // Already Closed
-                    if (!post.end_date_ts) return null; // Unknown
+                    if (post.status === 'closed') return -1; 
+                    if (!post.end_date_ts) return null; 
                     
-                    const now = Date.now();
-                    const diff = post.end_date_ts - now;
-                    return Math.ceil(diff / (1000 * 60 * 60 * 24));
+                    // Calculate based on midnight to midnight to ignore time differences
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    
+                    const endDate = new Date(post.end_date_ts);
+                    const target = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                    
+                    const diffTime = target - today;
+                    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                    
+                    return diffDays;
                 },
 
                 getDDayString(post) {
-                    // Check status first (Pre-calculated by server)
                     if (post.status === 'closed') return "마감";
                     
                     const days = this.getDDay(post);
                     if (days === null) return "";
-                    if (days < 0) return "마감"; // Just in case client time > server time
-                    if (days === 0) return "D-Day";
+                    if (days < 0) return "마감";
+                    if (days === 0) return "오늘마감";
                     return "D-" + days;
                 },
 
