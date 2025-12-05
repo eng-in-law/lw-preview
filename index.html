@@ -82,7 +82,7 @@
                 </div>
                 <div class="pl-1">
                     <p class="text-[10px] text-gray-500 font-medium tracking-wide">
-                        UPDATED: 2025. 12. 05. 16:17
+                        UPDATED: 2025. 12. 05. 16:21
                     </p>
                 </div>
             </div>
@@ -429,11 +429,11 @@
                     this.searchQuery = '';
                 },
                 
-                // Highlight matched text in title (Simple regex approach)
+                // Highlight matched text in title (Safe regex)
                 highlightMatch(text) {
                     if (!this.searchQuery) return text;
-                    // Escape special characters for regex
-                    const query = this.searchQuery.replace(/[.*+?^${}()|[\\\]/g, '\\$&');
+                    // Escape special characters for regex: . * + ? ^ $ { } ( ) | [ ] \
+                    const query = this.searchQuery.replace(/[.*+?^${}()|[\\]/g, '\\$&');
                     const regex = new RegExp(`(${query})`, 'gi');
                     return text.replace(regex, '<span class="text-purple-400 underline">$1</span>');
                 },
