@@ -82,7 +82,7 @@
                 </div>
                 <div class="pl-1">
                     <p class="text-[10px] text-gray-500 font-medium tracking-wide">
-                        UPDATED: 2025. 12. 05. 16:21
+                        UPDATED: 2025. 12. 05. 16:32
                     </p>
                 </div>
             </div>
@@ -285,23 +285,23 @@
                     <button @click="activeTab = 'body'" 
                             :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'body', 'text-gray-400 hover:text-gray-200': activeTab !== 'body' }"
                             class="flex-1 py-3 text-sm font-medium transition-colors">
-                        본문 (Body)
+                        본문
                     </button>
                     <button @click="activeTab = 'draft'" 
                             :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'draft', 'text-gray-400 hover:text-gray-200': activeTab !== 'draft' }"
                             class="flex-1 py-3 text-sm font-medium transition-colors">
-                        법령안 (Draft)
+                        법령안
                     </button>
                     <button x-show="impactContent" 
                             @click="activeTab = 'impact'" 
                             :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'impact', 'text-gray-400 hover:text-gray-200': activeTab !== 'impact' }"
                             class="flex-1 py-3 text-sm font-medium transition-colors">
-                        규제영향분석서 (Impact)
+                        규제영향분석서
                     </button>
                     <button @click="activeTab = 'reason'" 
                             :class="{ 'text-purple-400 border-b-2 border-purple-500': activeTab === 'reason', 'text-gray-400 hover:text-gray-200': activeTab !== 'reason' }"
                             class="flex-1 py-3 text-sm font-medium transition-colors">
-                        제개정 이유서 (Reason)
+                        제개정 이유서
                     </button>
                 </div>
 
