@@ -73,7 +73,7 @@
                 </div>
                 <div class="pl-1">
                     <p class="text-[10px] text-gray-500 font-medium tracking-wide">
-                        UPDATED: 2025. 12. 06. 07:39
+                        UPDATED: 2025. 12. 06. 07:43
                     </p>
                 </div>
             </div>
@@ -202,7 +202,19 @@
                                 <span>•</span>
                                 <span class="text-gray-400 font-medium" x-text="post.department"></span>
                                 <span class="hidden sm:inline">•</span>
-                                <span class="w-full sm:w-auto mt-1 sm:mt-0" x-text="post.period"></span>
+                                <span class="w-full sm:w-auto mt-1 sm:mt-0 font-bold text-gray-200" x-text="post.period"></span>
+                                
+                                <!-- D-Day Badge -->
+                                <template x-if="post.d_day_badge">
+                                    <span class="ml-2 px-2 py-0.5 rounded text-[10px] font-bold border border-opacity-30"
+                                          :class="{
+                                              'bg-red-900 text-red-300 border-red-500 animate-pulse': post.d_day_badge === '오늘마감',
+                                              'bg-red-900 text-red-300 border-red-500': post.d_day_badge.startsWith('D-') && parseInt(post.d_day_badge.substring(2)) <= 3,
+                                              'bg-yellow-900 text-yellow-300 border-yellow-500': post.d_day_badge.startsWith('D-') && parseInt(post.d_day_badge.substring(2)) <= 7 && parseInt(post.d_day_badge.substring(2)) > 3,
+                                              'bg-gray-700 text-gray-300 border-gray-500': post.status === 'closed'
+                                          }"
+                                          x-text="post.d_day_badge"></span>
+                                </template>
                             </div>
                             <h3 class="text-lg font-bold text-gray-100 mb-1 leading-tight group-hover:text-purple-400 transition-colors" x-text="post.title"></h3>
                             <p class="text-sm text-gray-400 truncate">상세 내용을 확인하려면 클릭하세요.</p>
