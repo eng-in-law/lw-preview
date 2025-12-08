@@ -125,7 +125,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-muted">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 20:16'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 20:23'"></span>
          </div>
 
          <!-- List -->
@@ -198,13 +198,8 @@
               <!-- Content Area -->
               <div class="flex-fill overflow-auto bg-darker p-4 position-relative">
                    
-                   <!-- Loading Indicator (Overlay) -->
-                   <div x-show="loading" class="position-absolute top-0 start-0 w-100 h-100 d-flex justify-content-center align-items-center bg-darker" style="z-index: 50; opacity: 0.8;">
-                       <div class="spinner-border text-primary" role="status"></div>
-                   </div>
-
                    <!-- Actual Content -->
-                   <div x-show="!loading">
+                   <div>
                        <div x-show="activeTab === 'insight'" class="markdown-body" x-html="insightContent"></div>
                        <div x-show="activeTab === 'body'" class="markdown-body" x-html="bodyContent"></div>
                        <div x-show="activeTab === 'draft'" class="markdown-body" x-html="draftContent"></div>
