@@ -191,7 +191,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark-surface border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 09. 00:46'"></span>
+            <span x-text="'UPDATED: 2025. 12. 09. 01:03'"></span>
          </div>
 
          <!-- List (Blue Content) -->
@@ -355,27 +355,43 @@
                     // Initialize Headroom only after DOM is ready
                     setTimeout(() => {
                         const detailBody = document.querySelector('.detail-body');
+                        const listBody = document.querySelector('#feed-list'); // Target List View
                         const bottomNav = document.querySelector('.mobile-bottom-nav');
                         
-                        if (detailBody && bottomNav) {
-                            console.log("Headroom: Targets found.", detailBody, bottomNav);
+                        if (bottomNav) {
+                            // 1. Headroom for Detail View Scroll
+                            if (detailBody) {
+                                const hrDetail = new Headroom(bottomNav, {
+                                    offset: 20,
+                                    tolerance: 5,
+                                    scroller: detailBody, 
+                                    classes: {
+                                        initial: "headroom",
+                                        pinned: "headroom--pinned",
+                                        unpinned: "headroom--unpinned"
+                                    }
+                                });
+                                hrDetail.init();
+                            }
+
+                            // 2. Headroom for List View Scroll
+                            if (listBody) {
+                                const hrList = new Headroom(bottomNav, {
+                                    offset: 20,
+                                    tolerance: 5,
+                                    scroller: listBody, 
+                                    classes: {
+                                        initial: "headroom",
+                                        pinned: "headroom--pinned",
+                                        unpinned: "headroom--unpinned"
+                                    }
+                                });
+                                hrList.init();
+                            }
                             
-                            // Bottom Bar - Use shared scroller
-                            const hrBottom = new Headroom(bottomNav, {
-                                offset: 20, // Lower offset for quicker reaction
-                                tolerance: 5,
-                                scroller: detailBody, 
-                                classes: {
-                                    initial: "headroom",
-                                    pinned: "headroom--pinned",
-                                    unpinned: "headroom--unpinned"
-                                },
-                                onPin: function() { console.log("Bottom: Pinned"); },
-                                onUnpin: function() { console.log("Bottom: Unpinned"); }
-                            });
-                            hrBottom.init();
+                            console.log("Headroom: Initialized for List & Detail.", { listBody, detailBody });
                         } else {
-                            console.warn("Headroom: Targets NOT found");
+                            console.warn("Headroom: Bottom Nav NOT found");
                         }
                     }, 1000);
                 },
