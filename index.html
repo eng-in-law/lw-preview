@@ -17,12 +17,13 @@
       @import url('https://rsms.me/inter/inter.css');
       :root {
       	--tblr-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-        --tblr-primary: #00e5ff; /* High Contrast Cyan */
-        --tblr-bg-surface-dark: #121212;
-        --tblr-body-bg: #000000;
-        --tblr-border-color: #444;
-        --tblr-body-color: #ffffff; /* Pure White Text */
-        --tblr-muted-color: #cccccc; /* Bright Gray for muted */
+        /* Oklch Colors - Natural & Uniform */
+        --tblr-primary: oklch(75% 0.18 220); /* Vibrant Cyan */
+        --tblr-bg-surface-dark: oklch(15% 0 0); /* Deep Gray */
+        --tblr-body-bg: oklch(0% 0 0); /* Pure Black */
+        --tblr-border-color: oklch(30% 0 0); /* Subtle Border */
+        --tblr-body-color: oklch(98% 0 0); /* Near White */
+        --tblr-muted-color: oklch(70% 0 0); /* Readable Gray */
       }
       body {
         background-color: var(--tblr-body-bg);
@@ -32,59 +33,59 @@
       }
       
       /* Global Contrast Overrides - NO DARK TEXT */
-      .text-muted { color: #cccccc !important; }
-      .text-secondary { color: #bbbbbb !important; }
-      a.text-muted:hover { color: #fff !important; }
-      .text-primary { color: #00e5ff !important; }
+      .text-muted { color: oklch(70% 0 0) !important; }
+      .text-secondary { color: oklch(60% 0 0) !important; }
+      a.text-muted:hover { color: oklch(100% 0 0) !important; }
+      .text-primary { color: var(--tblr-primary) !important; }
 
       /* Scrollbar */
       ::-webkit-scrollbar { width: 5px; height: 5px; }
-      ::-webkit-scrollbar-track { background: #1a1a1a; }
-      ::-webkit-scrollbar-thumb { background: #666; border-radius: 0; }
-      ::-webkit-scrollbar-thumb:hover { background: #888; }
+      ::-webkit-scrollbar-track { background: oklch(15% 0 0); }
+      ::-webkit-scrollbar-thumb { background: oklch(40% 0 0); border-radius: 0; }
+      ::-webkit-scrollbar-thumb:hover { background: oklch(50% 0 0); }
 
       /* Layout Utilities */
       .h-100-dvh { height: 100dvh; }
       .border-end { border-right: 1px solid var(--tblr-border-color) !important; }
       .border-bottom { border-bottom: 1px solid var(--tblr-border-color) !important; }
-      .bg-dark-surface { background-color: #1a1a1a; }
-      .bg-darker { background-color: #0f0f0f; }
+      .bg-dark-surface { background-color: var(--tblr-bg-surface-dark); }
+      .bg-darker { background-color: oklch(10% 0 0); }
       
       /* Markdown Override */
-      .markdown-body { color: #e0e0e0; line-height: 1.6; font-size: 0.9rem; }
-      .markdown-body h1 { font-size: 1.3em; border-bottom: 1px solid #555; margin-top: 1em; margin-bottom: 0.5em; color: #fff; font-weight: 700; }
-      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: #f0f0f0; font-weight: 600; }
+      .markdown-body { color: oklch(90% 0 0); line-height: 1.6; font-size: 0.9rem; }
+      .markdown-body h1 { font-size: 1.3em; border-bottom: 1px solid oklch(35% 0 0); margin-top: 1em; margin-bottom: 0.5em; color: oklch(98% 0 0); font-weight: 700; }
+      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: oklch(92% 0 0); font-weight: 600; }
       .markdown-body p { margin-bottom: 0.8em; }
-      .markdown-body table { font-size: 0.85em; border: 1px solid #555; width: 100%; }
-      .markdown-body th { background-color: #2a2a2a; color: #fff; padding: 6px 10px; border: 1px solid #555; font-weight: 600; }
-      .markdown-body td { padding: 6px 10px; border: 1px solid #555; color: #ddd; }
-      .highlight { background-color: #006064; color: #fff; padding: 0 4px; border-radius: 2px; } /* Cyan based highlight */
+      .markdown-body table { font-size: 0.85em; border: 1px solid oklch(35% 0 0); width: 100%; }
+      .markdown-body th { background-color: oklch(20% 0 0); color: oklch(98% 0 0); padding: 6px 10px; border: 1px solid oklch(35% 0 0); font-weight: 600; }
+      .markdown-body td { padding: 6px 10px; border: 1px solid oklch(35% 0 0); color: oklch(85% 0 0); }
+      .highlight { background-color: oklch(40% 0.15 220); color: oklch(98% 0 0); padding: 0 4px; border-radius: 2px; }
 
       /* Components */
-      .nav-link { border-radius: 0 !important; color: #ccc; }
-      .nav-link:hover { color: #fff; }
-      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid #333 !important; padding: 0.75rem 0.8rem !important; background-color: transparent !important; color: #ffffff; }
-      .list-group-item:hover { background-color: #1f1f1f !important; }
-      .list-group-item.active { background-color: #2a2a2a !important; border-left: 3px solid var(--tblr-primary); color: #fff; }
-      .list-group-item.active .text-muted { color: #ddd !important; }
+      .nav-link { border-radius: 0 !important; color: oklch(70% 0 0); }
+      .nav-link:hover { color: oklch(98% 0 0); }
+      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid oklch(25% 0 0) !important; padding: 0.75rem 0.8rem !important; background-color: transparent !important; color: oklch(98% 0 0); }
+      .list-group-item:hover { background-color: oklch(20% 0 0) !important; }
+      .list-group-item.active { background-color: oklch(25% 0 0) !important; border-left: 3px solid var(--tblr-primary); color: oklch(100% 0 0); }
+      .list-group-item.active .text-muted { color: oklch(80% 0 0) !important; }
       
-      .form-control-sm { border-radius: 0; background: #222; border: 1px solid #555; color: #fff; }
-      .form-control-sm:focus { background: #000; border-color: var(--tblr-primary); color: #fff; }
-      .form-control-sm::placeholder { color: #999; }
+      .form-control-sm { border-radius: 0; background: oklch(18% 0 0); border: 1px solid oklch(35% 0 0); color: oklch(98% 0 0); }
+      .form-control-sm:focus { background: oklch(10% 0 0); border-color: var(--tblr-primary); color: oklch(100% 0 0); }
+      .form-control-sm::placeholder { color: oklch(55% 0 0); }
       
       .btn { border-radius: 0; }
       .badge { border-radius: 0; font-weight: 600; }
       
-      /* Darker Badges */
-      .badge.bg-success { background-color: #157347 !important; }
-      .badge.bg-danger { background-color: #b02a37 !important; }
-      .badge.bg-info { background-color: #0b5ed7 !important; }
-      .badge.bg-orange { background-color: #d63384 !important; } /* Using purple/dark orange tone */
-      .badge.bg-secondary { background-color: #495057 !important; }
+      /* Darker & Natural Badges (Oklch) */
+      .badge.bg-success { background-color: oklch(50% 0.15 145) !important; } /* Natural Green */
+      .badge.bg-danger { background-color: oklch(50% 0.18 25) !important; }   /* Natural Red */
+      .badge.bg-info { background-color: oklch(50% 0.15 250) !important; }     /* Natural Blue */
+      .badge.bg-orange { background-color: oklch(55% 0.18 50) !important; }    /* Natural Orange */
+      .badge.bg-secondary { background-color: oklch(35% 0 0) !important; }     /* Neutral Gray */
       
-      .tab-ht { border-bottom: 2px solid transparent; color: #aaa; padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
-      .tab-ht:hover { color: #fff; background: #222; }
-      .tab-ht.active { color: #00e5ff; border-bottom: 2px solid #00e5ff; background: #1a1a1a; }
+      .tab-ht { border-bottom: 2px solid transparent; color: oklch(65% 0 0); padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
+      .tab-ht:hover { color: oklch(98% 0 0); background: oklch(18% 0 0); }
+      .tab-ht.active { color: var(--tblr-primary); border-bottom: 2px solid var(--tblr-primary); background: var(--tblr-bg-surface-dark); }
 
       /* --- RESPONSIVE LOGIC --- */
       .desktop-sidebar { display: flex; }
@@ -97,7 +98,7 @@
           .mobile-bottom-nav { 
               display: flex !important; 
               position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
-              background-color: #1a1a1a; border-top: 1px solid #333; z-index: 3000;
+              background-color: var(--tblr-bg-surface-dark); border-top: 1px solid oklch(25% 0 0); z-index: 3000;
               justify-content: space-around; align-items: center;
           }
           .list-pane { width: 100% !important; border-right: none !important; padding-bottom: 60px; }
@@ -107,7 +108,7 @@
               z-index: 2000;
               transform: translateY(100%);
               transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1);
-              background-color: #0f0f0f;
+              background-color: var(--tblr-body-bg);
           }
           .detail-pane.mobile-active { transform: translateY(0) !important; }
       }
@@ -160,7 +161,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 22:24'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 22:34'"></span>
          </div>
 
          <!-- List -->
@@ -195,7 +196,7 @@
                             <div class="text-secondary" x-text="post.department"></div>
                             <div class="text-primary fw-bold" style="font-size: 0.75rem;" x-text="post.law_field"></div>
                         </div>
-                        <div class="text-end" style="font-size: 0.7rem; color: #ccc;">
+                        <div class="text-end" style="font-size: 0.7rem; color: oklch(70% 0 0);">
                              <div x-text="post.period"></div>
                         </div>
                     </div>
@@ -292,7 +293,7 @@
                     law_field: 'all'
                 },
                 
-                activeTab: 'insight', 
+                activeTab: 'insight', // Persistent tab state
                 
                 fuse: null,
                 fuseOptions: {
@@ -367,6 +368,7 @@
                         if (this.loading) {
                             console.warn('Fetch timed out');
                             this.loading = false;
+                            this.bodyContent = '<div class="alert alert-warning rounded-0">데이터 로딩 시간이 초과되었습니다.</div>';
                         }
                     }, 5000);
 
@@ -383,12 +385,12 @@
                         const res = await fetch(`data/${post.id}.json`);
                         
                         
-                        clearTimeout(timeoutId); 
+                        clearTimeout(timeoutId); // Clear timeout on success
 
                         if (!res.ok) throw new Error('Fetch failed');
                         
                         const data = await res.json();
-                        this.bodyContent = data.body || '<p class="text-secondary">본문 내용이 없습니다.</p>';
+                        this.bodyContent = data.body || '<p class="text-muted">본문 내용이 없습니다.</p>';
                         this.draftContent = data.draft;
                         this.reasonContent = data.reason;
                         this.impactContent = data.impact;
