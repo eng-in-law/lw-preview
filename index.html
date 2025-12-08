@@ -106,28 +106,6 @@
           will-change: transform;
           transition: transform 200ms linear;
       }
-      #feed-list {
-          padding-top: var(--list-toolbar-height, 0px);
-          padding-bottom: var(--bottom-nav-gap, 0px);
-          transition: padding 200ms ease;
-      }
-      #feed-list.list-toolbar-hidden {
-          padding-top: 0.5rem;
-      }
-      #feed-list.bottom-nav-hidden {
-          padding-bottom: 0.5rem;
-      }
-      .detail-body {
-          padding-top: var(--detail-header-height, 70px);
-          padding-bottom: var(--bottom-nav-gap, 0px);
-          transition: padding 200ms ease;
-      }
-      .detail-body.detail-header-hidden {
-          padding-top: 0.5rem;
-      }
-      .detail-body.bottom-nav-hidden {
-          padding-bottom: 0.5rem;
-      }
 
       /* --- RESPONSIVE LOGIC --- */
       .desktop-sidebar { display: flex; }
@@ -218,7 +196,7 @@
                  </div>
              </div>
              <div class="d-flex justify-content-between align-items-center px-2 py-1 small text-secondary flex-wrap gap-2">
-                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 03:37'"></span>
+                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 03:42'"></span>
                 <div class="d-flex gap-2 align-items-center">
                     <span>총 <span x-text="filteredPosts.length"></span>건</span>
                     <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
@@ -399,26 +377,41 @@
                     const listToolbar = document.querySelector('.list-toolbar');
                     const detailBodyEl = document.querySelector('.detail-body');
                     const detailHeader = document.querySelector('.detail-header');
+                    const bottomNavEl = document.querySelector('.mobile-bottom-nav');
 
-                    const updateHeights = () => {
-                        if (listBody && listToolbar) {
-                            listBody.style.setProperty('--list-toolbar-height', `${listToolbar.offsetHeight}px`);
-                        }
-                        if (detailBodyEl && detailHeader) {
-                            detailBodyEl.style.setProperty('--detail-header-height', `${detailHeader.offsetHeight}px`);
-                        }
-
-                        const bottomNavEl = document.querySelector('.mobile-bottom-nav');
-                        const navHeight = bottomNavEl ? (bottomNavEl.offsetHeight || 0) + 8 : 0;
-                        const navGap = `${navHeight}px`;
-                        if (listBody) listBody.style.setProperty('--bottom-nav-gap', navGap);
-                        if (detailBodyEl) detailBodyEl.style.setProperty('--bottom-nav-gap', navGap);
+                    const applyListTopPadding = (hidden) => {
+                        if (!listBody) return;
+                        const height = listToolbar ? listToolbar.offsetHeight : 0;
+                        listBody.style.paddingTop = hidden ? '0px' : `${height}px`;
                     };
 
-                    updateHeights();
+                    const applyDetailTopPadding = (hidden) => {
+                        if (!detailBodyEl) return;
+                        const height = detailHeader ? detailHeader.offsetHeight : 0;
+                        detailBodyEl.style.paddingTop = hidden ? '0px' : `${height}px`;
+                    };
+
+                    const applyBottomPadding = (hidden) => {
+                        const height = bottomNavEl ? bottomNavEl.offsetHeight : 0;
+                        const value = hidden ? '0px' : `${height + 8}px`;
+                        if (listBody) listBody.style.paddingBottom = value;
+                        if (detailBodyEl) detailBodyEl.style.paddingBottom = value;
+                    };
+
+                    const updateAll = () => {
+                        applyListTopPadding(false);
+                        applyDetailTopPadding(false);
+                        applyBottomPadding(false);
+                    };
+
+                    updateAll();
                     if (typeof window !== 'undefined') {
-                        window.addEventListener('resize', updateHeights);
+                        window.addEventListener('resize', updateAll);
                     }
+
+                    this.applyListTopPadding = applyListTopPadding;
+                    this.applyDetailTopPadding = applyDetailTopPadding;
+                    this.applyBottomPadding = applyBottomPadding;
                 },
                 
                 initHeadroom() {
@@ -430,18 +423,9 @@
                         const listToolbar = document.querySelector('.list-toolbar');
                         const detailHeader = document.querySelector('.detail-header');
 
-                        const setListToolbarHidden = (hidden) => {
-                            if (listBody) listBody.classList.toggle('list-toolbar-hidden', hidden);
-                        };
-
-                        const setBottomNavHidden = (hidden) => {
-                            if (listBody) listBody.classList.toggle('bottom-nav-hidden', hidden);
-                            if (detailBody) detailBody.classList.toggle('bottom-nav-hidden', hidden);
-                        };
-
-                        const setDetailHeaderHidden = (hidden) => {
-                            if (detailBody) detailBody.classList.toggle('detail-header-hidden', hidden);
-                        };
+                        const applyListTopPadding = this.applyListTopPadding || (() => {});
+                        const applyDetailTopPadding = this.applyDetailTopPadding || (() => {});
+                        const applyBottomPadding = this.applyBottomPadding || (() => {});
 
                         if (bottomNav) {
                             // 1. Headroom for Detail View Scroll (Bottom Nav)
@@ -455,8 +439,8 @@
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
                                     },
-                                    onPin: () => setBottomNavHidden(false),
-                                    onUnpin: () => setBottomNavHidden(true)
+                                    onPin: () => applyBottomPadding(false),
+                                    onUnpin: () => applyBottomPadding(true)
                                 });
                                 hrDetailBottom.init();
                             }
@@ -472,11 +456,11 @@
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
                                     },
-                                    onPin: () => setBottomNavHidden(false),
-                                    onUnpin: () => setBottomNavHidden(true)
+                                    onPin: () => applyBottomPadding(false),
+                                    onUnpin: () => applyBottomPadding(true)
                                 });
                                 hrListBottom.init();
-                                setBottomNavHidden(false);
+                                applyBottomPadding(false);
                             }
                         } else {
                             console.warn("Headroom: Bottom Nav NOT found");
@@ -492,15 +476,15 @@
                                     pinned: "headroom--pinned",
                                     unpinned: "headroom--unpinned"
                                 },
-                                onPin: () => setListToolbarHidden(false),
-                                onUnpin: () => setListToolbarHidden(true)
+                                onPin: () => applyListTopPadding(false),
+                                onUnpin: () => applyListTopPadding(true)
                             });
                             hrListTop.init();
-                            setListToolbarHidden(false);
+                            applyListTopPadding(false);
                         }
 
                         if (detailHeader && detailBody) {
-                                const hrDetailTop = new Headroom(detailHeader, {
+                            const hrDetailTop = new Headroom(detailHeader, {
                                     offset: 10,
                                     tolerance: 5,
                                     scroller: detailBody,
@@ -509,11 +493,11 @@
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
                                     },
-                                    onPin: () => setDetailHeaderHidden(false),
-                                    onUnpin: () => setDetailHeaderHidden(true)
+                                    onPin: () => applyDetailTopPadding(false),
+                                    onUnpin: () => applyDetailTopPadding(true)
                                 });
                                 hrDetailTop.init();
-                                setDetailHeaderHidden(false);
+                                applyDetailTopPadding(false);
                             }
                         
                         console.log("Headroom: Initialized for toolbars.", { listBody, detailBody });
