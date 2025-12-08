@@ -97,6 +97,15 @@
       .tab-ht { border-bottom: 2px solid transparent; color: oklch(65% 0 0); padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
       .tab-ht:hover { color: oklch(98% 0 0); background: oklch(18% 0 0); }
       .tab-ht.active { color: var(--tblr-primary); border-bottom: 2px solid var(--tblr-primary); background: var(--tblr-bg-surface-dark); }
+      .list-toolbar {
+          z-index: 30;
+          background-color: var(--tblr-bg-surface-dark);
+      }
+      .list-toolbar.headroom,
+      .detail-header.headroom {
+          will-change: transform;
+          transition: transform 200ms linear;
+      }
 
       /* --- RESPONSIVE LOGIC --- */
       .desktop-sidebar { display: flex; }
@@ -169,35 +178,35 @@
       <!-- [Main] List View (BLUE BG) -->
       <div class="list-pane d-flex flex-column border-end bg-blue-deep">
          <!-- Header (Darker/Black) -->
-         <div class="p-2 border-bottom bg-dark-surface">
-             <div class="d-flex gap-2 mb-2 flex-wrap align-items-stretch">
-                <div class="d-flex gap-1 flex-grow-1" style="min-width: 220px;">
-                    <select class="form-select form-select-sm" x-model="activeFilters.department">
-                        <option value="all">전체 부처</option>
-                        <template x-for="dep in filters.departments" :key="dep"><option :value="dep" x-text="dep"></option></template>
-                    </select>
-                    <select class="form-select form-select-sm" x-model="activeFilters.law_field" style="width: 100px;">
-                        <option value="all">분야</option>
-                        <template x-for="field in filters.law_fields" :key="field"><option :value="field" x-text="field"></option></template>
-                    </select>
-                </div>
-                <div class="d-flex gap-1" style="width: 50%; min-width: 240px;">
-                    <input type="text" x-model="searchQuery" x-ref="searchInput" class="form-control form-control-sm w-100" placeholder="법령안 내용 검색">
-                    <button class="btn btn-sm btn-icon btn-dark border border-secondary" @click="$refs.searchInput.focus()">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+         <div class="list-toolbar border-bottom">
+             <div class="p-2 border-bottom">
+                 <div class="d-flex gap-2 flex-wrap align-items-stretch">
+                    <div class="d-flex gap-1 flex-grow-1" style="min-width: 220px;">
+                        <select class="form-select form-select-sm" x-model="activeFilters.department">
+                            <option value="all">전체 부처</option>
+                            <template x-for="dep in filters.departments" :key="dep"><option :value="dep" x-text="dep"></option></template>
+                        </select>
+                        <select class="form-select form-select-sm" x-model="activeFilters.law_field" style="width: 100px;">
+                            <option value="all">분야</option>
+                            <template x-for="field in filters.law_fields" :key="field"><option :value="field" x-text="field"></option></template>
+                        </select>
+                    </div>
+                    <div class="d-flex gap-1" style="width: 50%; min-width: 240px;">
+                        <input type="text" x-model="searchQuery" x-ref="searchInput" class="form-control form-control-sm w-100" placeholder="법령안 내용 검색">
+                        <button class="btn btn-sm btn-icon btn-dark border border-secondary" @click="$refs.searchInput.focus()">
+                            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
+                        </button>
+                    </div>
+                 </div>
+             </div>
+             <div class="d-flex justify-content-between align-items-center px-2 py-1 small text-secondary flex-wrap gap-2">
+                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 02:53'"></span>
+                <div class="d-flex gap-2 align-items-center">
+                    <span>총 <span x-text="filteredPosts.length"></span>건</span>
+                    <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
+                        <span x-text="getImpactSortLabel()"></span>
                     </button>
                 </div>
-             </div>
-         </div>
-
-         <!-- Status Bar -->
-         <div class="d-flex justify-content-between align-items-center px-2 py-1 bg-dark-surface border-bottom small text-secondary flex-wrap gap-2">
-            <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 02:44'"></span>
-            <div class="d-flex gap-2 align-items-center">
-                <span>총 <span x-text="filteredPosts.length"></span>건</span>
-                <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
-                    <span x-text="getImpactSortLabel()"></span>
-                </button>
             </div>
          </div>
 
@@ -371,11 +380,13 @@
                         const detailBody = document.querySelector('.detail-body');
                         const listBody = document.querySelector('#feed-list'); // Target List View
                         const bottomNav = document.querySelector('.mobile-bottom-nav');
+                        const listToolbar = document.querySelector('.list-toolbar');
+                        const detailHeader = document.querySelector('.detail-header');
                         
                         if (bottomNav) {
-                            // 1. Headroom for Detail View Scroll
+                            // 1. Headroom for Detail View Scroll (Bottom Nav)
                             if (detailBody) {
-                                const hrDetail = new Headroom(bottomNav, {
+                                const hrDetailBottom = new Headroom(bottomNav, {
                                     offset: 20,
                                     tolerance: 5,
                                     scroller: detailBody, 
@@ -385,12 +396,12 @@
                                         unpinned: "headroom--unpinned"
                                     }
                                 });
-                                hrDetail.init();
+                                hrDetailBottom.init();
                             }
 
-                            // 2. Headroom for List View Scroll
+                            // 2. Headroom for List View Scroll (Bottom Nav)
                             if (listBody) {
-                                const hrList = new Headroom(bottomNav, {
+                                const hrListBottom = new Headroom(bottomNav, {
                                     offset: 20,
                                     tolerance: 5,
                                     scroller: listBody, 
@@ -400,13 +411,41 @@
                                         unpinned: "headroom--unpinned"
                                     }
                                 });
-                                hrList.init();
+                                hrListBottom.init();
                             }
-                            
-                            console.log("Headroom: Initialized for List & Detail.", { listBody, detailBody });
                         } else {
                             console.warn("Headroom: Bottom Nav NOT found");
                         }
+
+                        if (listToolbar && listBody) {
+                            const hrListTop = new Headroom(listToolbar, {
+                                offset: 10,
+                                tolerance: 5,
+                                scroller: listBody,
+                                classes: {
+                                    initial: "headroom",
+                                    pinned: "headroom--pinned",
+                                    unpinned: "headroom--unpinned"
+                                }
+                            });
+                            hrListTop.init();
+                        }
+
+                        if (detailHeader && detailBody) {
+                            const hrDetailTop = new Headroom(detailHeader, {
+                                offset: 10,
+                                tolerance: 5,
+                                scroller: detailBody,
+                                classes: {
+                                    initial: "headroom",
+                                    pinned: "headroom--pinned",
+                                    unpinned: "headroom--unpinned"
+                                }
+                            });
+                            hrDetailTop.init();
+                        }
+                        
+                        console.log("Headroom: Initialized for toolbars.", { listBody, detailBody });
                     }, 1000);
                 },
 
