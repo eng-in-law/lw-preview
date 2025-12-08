@@ -199,7 +199,7 @@
                  </div>
              </div>
              <div class="d-flex justify-content-between align-items-center px-2 py-1 small text-secondary flex-wrap gap-2">
-                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 04:12'"></span>
+                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 04:22'"></span>
                 <div class="d-flex gap-2 align-items-center">
                     <span>총 <span x-text="filteredPosts.length"></span>건</span>
                     <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
@@ -382,6 +382,16 @@
                         const bottomNav = document.querySelector('.mobile-bottom-nav');
                         const listToolbar = document.querySelector('.list-toolbar');
                         const detailHeader = document.querySelector('.detail-header');
+                        const listPane = document.querySelector('.list-pane');
+                        const detailPane = document.querySelector('.detail-pane');
+
+                        const applyBottomGap = (hidden) => {
+                            if (!bottomNav || !self.isMobile) return;
+                            const gap = bottomNav.offsetHeight || 0;
+                            const value = hidden ? '0px' : `${gap}px`;
+                            if (listPane) listPane.style.paddingBottom = value;
+                            if (detailPane) detailPane.style.paddingBottom = value;
+                        };
                         
                         if (bottomNav) {
                             // 1. Headroom for Detail View Scroll (Bottom Nav)
@@ -394,7 +404,9 @@
                                         initial: "headroom",
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
-                                    }
+                                    },
+                                    onPin: () => applyBottomGap(false),
+                                    onUnpin: () => applyBottomGap(true)
                                 });
                                 hrDetailBottom.init();
                             }
@@ -409,9 +421,12 @@
                                         initial: "headroom",
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
-                                    }
+                                    },
+                                    onPin: () => applyBottomGap(false),
+                                    onUnpin: () => applyBottomGap(true)
                                 });
                                 hrListBottom.init();
+                                applyBottomGap(false);
                             }
                         } else {
                             console.warn("Headroom: Bottom Nav NOT found");
