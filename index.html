@@ -117,6 +117,17 @@
       #feed-list.bottom-nav-hidden {
           padding-bottom: 0.5rem;
       }
+      .detail-body {
+          padding-top: var(--detail-header-height, 70px);
+          padding-bottom: var(--bottom-nav-gap, 0px);
+          transition: padding 200ms ease;
+      }
+      .detail-body.detail-header-hidden {
+          padding-top: 0.5rem;
+      }
+      .detail-body.bottom-nav-hidden {
+          padding-bottom: 0.5rem;
+      }
 
       /* --- RESPONSIVE LOGIC --- */
       .desktop-sidebar { display: flex; }
@@ -156,10 +167,6 @@
           .detail-header {
               position: fixed; top: 0; left: 0; width: 100%; z-index: 2050;
               background-color: var(--tblr-bg-surface-dark);
-          }
-          /* Add padding to body so content isn't hidden behind fixed header */
-          .detail-body {
-              padding-top: 110px !important; /* Increased to clear header */
           }
       }
       [x-cloak] { display: none !important; }
@@ -211,7 +218,7 @@
                  </div>
              </div>
              <div class="d-flex justify-content-between align-items-center px-2 py-1 small text-secondary flex-wrap gap-2">
-                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 03:02'"></span>
+                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 03:37'"></span>
                 <div class="d-flex gap-2 align-items-center">
                     <span>총 <span x-text="filteredPosts.length"></span>건</span>
                     <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
@@ -377,7 +384,7 @@
                     if (typeof window !== 'undefined') {
                         window.addEventListener('resize', () => this.updateIsMobile());
                     }
-                    this.setupListViewportSpacing();
+                    this.setupViewportSpacing();
                     this.fuse = new Fuse(this.allPosts, this.fuseOptions);
                     this.$watch('searchQuery', () => this.filterPosts());
                     this.$watch('activeFilters', () => this.filterPosts());
@@ -386,28 +393,31 @@
                     this.initHeadroom();
                 },
 
-                setupListViewportSpacing() {
+                setupViewportSpacing() {
                     if (typeof document === 'undefined') return;
                     const listBody = document.querySelector('#feed-list');
                     const listToolbar = document.querySelector('.list-toolbar');
-                    const bottomNav = document.querySelector('.mobile-bottom-nav');
-                    if (!listBody) return;
+                    const detailBodyEl = document.querySelector('.detail-body');
+                    const detailHeader = document.querySelector('.detail-header');
 
-                    const updateToolbarHeight = () => {
-                        if (!listToolbar) return;
-                        const height = listToolbar.offsetHeight;
-                        listBody.style.setProperty('--list-toolbar-height', `${height}px`);
+                    const updateHeights = () => {
+                        if (listBody && listToolbar) {
+                            listBody.style.setProperty('--list-toolbar-height', `${listToolbar.offsetHeight}px`);
+                        }
+                        if (detailBodyEl && detailHeader) {
+                            detailBodyEl.style.setProperty('--detail-header-height', `${detailHeader.offsetHeight}px`);
+                        }
+
+                        const bottomNavEl = document.querySelector('.mobile-bottom-nav');
+                        const navHeight = bottomNavEl ? (bottomNavEl.offsetHeight || 0) + 8 : 0;
+                        const navGap = `${navHeight}px`;
+                        if (listBody) listBody.style.setProperty('--bottom-nav-gap', navGap);
+                        if (detailBodyEl) detailBodyEl.style.setProperty('--bottom-nav-gap', navGap);
                     };
-                    updateToolbarHeight();
-                    if (typeof window !== 'undefined') {
-                        window.addEventListener('resize', updateToolbarHeight);
-                    }
 
-                    if (bottomNav) {
-                        const navHeight = bottomNav.offsetHeight || 0;
-                        listBody.style.setProperty('--bottom-nav-gap', `${navHeight + 8}px`);
-                    } else {
-                        listBody.style.setProperty('--bottom-nav-gap', '0px');
+                    updateHeights();
+                    if (typeof window !== 'undefined') {
+                        window.addEventListener('resize', updateHeights);
                     }
                 },
                 
@@ -421,13 +431,16 @@
                         const detailHeader = document.querySelector('.detail-header');
 
                         const setListToolbarHidden = (hidden) => {
-                            if (!listBody) return;
-                            listBody.classList.toggle('list-toolbar-hidden', hidden);
+                            if (listBody) listBody.classList.toggle('list-toolbar-hidden', hidden);
                         };
 
                         const setBottomNavHidden = (hidden) => {
-                            if (!listBody) return;
-                            listBody.classList.toggle('bottom-nav-hidden', hidden);
+                            if (listBody) listBody.classList.toggle('bottom-nav-hidden', hidden);
+                            if (detailBody) detailBody.classList.toggle('bottom-nav-hidden', hidden);
+                        };
+
+                        const setDetailHeaderHidden = (hidden) => {
+                            if (detailBody) detailBody.classList.toggle('detail-header-hidden', hidden);
                         };
 
                         if (bottomNav) {
@@ -441,7 +454,9 @@
                                         initial: "headroom",
                                         pinned: "headroom--pinned",
                                         unpinned: "headroom--unpinned"
-                                    }
+                                    },
+                                    onPin: () => setBottomNavHidden(false),
+                                    onUnpin: () => setBottomNavHidden(true)
                                 });
                                 hrDetailBottom.init();
                             }
@@ -485,18 +500,21 @@
                         }
 
                         if (detailHeader && detailBody) {
-                            const hrDetailTop = new Headroom(detailHeader, {
-                                offset: 10,
-                                tolerance: 5,
-                                scroller: detailBody,
-                                classes: {
-                                    initial: "headroom",
-                                    pinned: "headroom--pinned",
-                                    unpinned: "headroom--unpinned"
-                                }
-                            });
-                            hrDetailTop.init();
-                        }
+                                const hrDetailTop = new Headroom(detailHeader, {
+                                    offset: 10,
+                                    tolerance: 5,
+                                    scroller: detailBody,
+                                    classes: {
+                                        initial: "headroom",
+                                        pinned: "headroom--pinned",
+                                        unpinned: "headroom--unpinned"
+                                    },
+                                    onPin: () => setDetailHeaderHidden(false),
+                                    onUnpin: () => setDetailHeaderHidden(true)
+                                });
+                                hrDetailTop.init();
+                                setDetailHeaderHidden(false);
+                            }
                         
                         console.log("Headroom: Initialized for toolbars.", { listBody, detailBody });
                     }, 1000);
