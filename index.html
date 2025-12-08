@@ -75,6 +75,13 @@
       .btn { border-radius: 0; }
       .badge { border-radius: 0; font-weight: 600; }
       
+      /* Darker Badges */
+      .badge.bg-success { background-color: #157347 !important; }
+      .badge.bg-danger { background-color: #b02a37 !important; }
+      .badge.bg-info { background-color: #0b5ed7 !important; }
+      .badge.bg-orange { background-color: #d63384 !important; } /* Using purple/dark orange tone */
+      .badge.bg-secondary { background-color: #495057 !important; }
+      
       .tab-ht { border-bottom: 2px solid transparent; color: #aaa; padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
       .tab-ht:hover { color: #fff; background: #222; }
       .tab-ht.active { color: #00e5ff; border-bottom: 2px solid #00e5ff; background: #1a1a1a; }
@@ -153,7 +160,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 21:57'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 22:24'"></span>
          </div>
 
          <!-- List -->
@@ -178,7 +185,7 @@
                                   x-text="post.amendment_type">
                             </span>
                         </div>
-                        <span class="text-secondary" style="font-size: 0.7rem;" x-text="post.id"></span>
+                        <span class="text-secondary" style="font-size: 0.7rem;" x-text="'#' + post.id"></span>
                     </div>
                     
                     <div class="fw-bold text-white mb-2 lh-base" style="font-size: 0.95rem;" x-html="post.highlightedTitle || post.title"></div>
@@ -189,7 +196,7 @@
                             <div class="text-primary fw-bold" style="font-size: 0.75rem;" x-text="post.law_field"></div>
                         </div>
                         <div class="text-end" style="font-size: 0.7rem; color: #ccc;">
-                             <div x-text="post.period.split('~')[1]?.trim()"></div>
+                             <div x-text="post.period"></div>
                         </div>
                     </div>
                  </a>
@@ -355,6 +362,7 @@
                     this.selectedPost = post;
                     this.loading = true;
                     
+                    // Fallback: If no content loads within 5 seconds, force stop loading
                     const timeoutId = setTimeout(() => {
                         if (this.loading) {
                             console.warn('Fetch timed out');
