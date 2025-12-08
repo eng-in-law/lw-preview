@@ -2,7 +2,7 @@
 <html lang="ko">
   <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1, user-scalable=no"/>
     <meta http-equiv="X-UA-Compatible" content="ie=edge"/>
     <title>LegalWard Pro</title>
     <!-- Tabler Core -->
@@ -21,69 +21,103 @@
         --tblr-bg-surface-dark: #121212;
         --tblr-body-bg: #000000;
         --tblr-border-color: #333;
+        --tblr-body-color: #e0e0e0;
+        --tblr-muted-color: #a0a0a0;
       }
       body {
         background-color: var(--tblr-body-bg);
+        color: var(--tblr-body-color);
         overflow: hidden; 
-        font-size: 0.85rem; /* HTS style: smaller font */
+        font-size: 0.85rem;
       }
       
-      /* HTS Style Scrollbar */
+      /* Global Contrast Overrides */
+      .text-muted { color: #a0a0a0 !important; }
+      .text-secondary { color: #aaa !important; }
+      a.text-muted:hover { color: #fff !important; }
+
+      /* Scrollbar */
       ::-webkit-scrollbar { width: 5px; height: 5px; }
       ::-webkit-scrollbar-track { background: #1a1a1a; }
-      ::-webkit-scrollbar-thumb { background: #555; border-radius: 0; }
-      ::-webkit-scrollbar-thumb:hover { background: #777; }
+      ::-webkit-scrollbar-thumb { background: #666; border-radius: 0; }
+      ::-webkit-scrollbar-thumb:hover { background: #888; }
 
-      /* Reset utilities for dense layout */
+      /* Layout Utilities */
       .h-100-dvh { height: 100dvh; }
       .border-end { border-right: 1px solid var(--tblr-border-color) !important; }
       .border-bottom { border-bottom: 1px solid var(--tblr-border-color) !important; }
       .bg-dark-surface { background-color: #1a1a1a; }
       .bg-darker { background-color: #0f0f0f; }
       
-      /* Markdown Override (Dense) */
-      .markdown-body { color: #ccc; line-height: 1.5; font-size: 0.9rem; }
-      .markdown-body h1 { font-size: 1.3em; border-bottom: 1px solid #444; margin-top: 1em; margin-bottom: 0.5em; color: #fff; }
-      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: #eee; }
+      /* Markdown Override */
+      .markdown-body { color: #e0e0e0; line-height: 1.6; font-size: 0.9rem; }
+      .markdown-body h1 { font-size: 1.3em; border-bottom: 1px solid #555; margin-top: 1em; margin-bottom: 0.5em; color: #fff; font-weight: 700; }
+      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: #f0f0f0; font-weight: 600; }
       .markdown-body p { margin-bottom: 0.8em; }
-      .markdown-body table { font-size: 0.85em; border: 1px solid #444; }
-      .markdown-body th { background-color: #252525; color: #fff; padding: 4px 8px; }
-      .markdown-body td { padding: 4px 8px; border: 1px solid #444; }
-      .highlight { background-color: #4a235a; color: #fff; padding: 0 2px; }
+      .markdown-body table { font-size: 0.85em; border: 1px solid #555; width: 100%; }
+      .markdown-body th { background-color: #2a2a2a; color: #fff; padding: 6px 10px; border: 1px solid #555; font-weight: 600; }
+      .markdown-body td { padding: 6px 10px; border: 1px solid #555; color: #ddd; }
+      .highlight { background-color: #5b2c6f; color: #fff; padding: 0 4px; border-radius: 2px; }
 
-      /* HTS Components */
-      .nav-link { border-radius: 0 !important; }
-      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid #333 !important; padding: 0.5rem 0.75rem !important; }
-      .list-group-item.active { background-color: #2c2c2c !important; border-left: 3px solid var(--tblr-primary); }
-      .form-control-sm { border-radius: 0; background: #222; border: 1px solid #444; color: #fff; }
+      /* Components */
+      .nav-link { border-radius: 0 !important; color: #ccc; }
+      .nav-link:hover { color: #fff; }
+      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid #333 !important; padding: 0.6rem 0.8rem !important; background-color: transparent !important; color: #e0e0e0; }
+      .list-group-item:hover { background-color: #1f1f1f !important; }
+      .list-group-item.active { background-color: #2a2a2a !important; border-left: 3px solid var(--tblr-primary); color: #fff; }
+      .list-group-item.active .text-muted { color: #ccc !important; }
+      .form-control-sm { border-radius: 0; background: #222; border: 1px solid #555; color: #fff; }
       .form-control-sm:focus { background: #000; border-color: var(--tblr-primary); color: #fff; }
       .btn { border-radius: 0; }
       .badge { border-radius: 0; }
       
-      .tab-ht {
-          border-bottom: 2px solid transparent;
-          color: #888;
-          padding: 8px 16px;
-          font-weight: 600;
-          font-size: 0.85rem;
-          cursor: pointer;
-      }
-      .tab-ht:hover { color: #ccc; background: #1a1a1a; }
-      .tab-ht.active {
-          color: var(--tblr-primary);
-          border-bottom: 2px solid var(--tblr-primary);
-          background: #1a1a1a;
+      .tab-ht { border-bottom: 2px solid transparent; color: #aaa; padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
+      .tab-ht:hover { color: #fff; background: #222; }
+      .tab-ht.active { color: #fff; border-bottom: 2px solid var(--tblr-primary); background: #1a1a1a; }
+
+      /* --- RESPONSIVE LOGIC --- */
+      
+      /* Default Desktop Styles */
+      .desktop-sidebar { display: flex; }
+      .mobile-bottom-nav { display: none; }
+      .list-pane { width: 380px; flex-shrink: 0; }
+      .detail-pane { position: relative; flex: 1; min-width: 0; }
+      
+      /* Mobile Styles (< 768px) */
+      @media (max-width: 768px) {
+          .desktop-sidebar { display: none !important; }
+          
+          .mobile-bottom-nav { 
+              display: flex !important; 
+              position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
+              background-color: #1a1a1a; border-top: 1px solid #333; z-index: 3000;
+              justify-content: space-around; align-items: center;
+          }
+          
+          .list-pane { width: 100% !important; border-right: none !important; padding-bottom: 60px; } /* Space for bottom nav */
+          
+          .detail-pane {
+              position: fixed !important; 
+              top: 0; left: 0; width: 100%; height: 100%;
+              z-index: 2000;
+              transform: translateY(100%);
+              transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); /* Apple-like ease */
+              background-color: #0f0f0f;
+          }
+          
+          .detail-pane.mobile-active {
+              transform: translateY(0) !important;
+          }
       }
 
-      /* Fix overlapping issues */
       [x-cloak] { display: none !important; }
     </style>
   </head>
   <body class="theme-dark" x-data="app()" x-init="initApp()">
     <div class="d-flex h-100-dvh w-100 overflow-hidden">
       
-      <!-- [Pane 1] Vertical Toolbar (Fixed 60px) -->
-      <aside class="d-flex flex-column border-end bg-dark-surface align-items-center py-2" style="width: 60px; flex-shrink: 0; z-index: 20;">
+      <!-- [Desktop] Sidebar -->
+      <aside class="desktop-sidebar flex-column border-end bg-dark-surface align-items-center py-2" style="width: 60px; z-index: 20;">
         <div class="mb-4 text-primary">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-gavel" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 10l7.383 7.418c.823 .82 .823 2.148 0 2.967a2.11 2.11 0 0 1 -2.976 0l-7.407 -7.385" /><path d="M6 9l4 4" /><path d="M13 6l4 4" /><path d="M14 3l-9.3 9.3" /></svg>
         </div>
@@ -100,8 +134,8 @@
         </div>
       </aside>
 
-      <!-- [Pane 2] List View (Fixed 380px) -->
-      <div class="d-flex flex-column border-end bg-dark-surface" style="width: 380px; flex-shrink: 0;">
+      <!-- [Main] List View -->
+      <div class="list-pane d-flex flex-column border-end bg-dark-surface">
          <!-- Header -->
          <div class="p-2 border-bottom bg-darker">
              <div class="d-flex gap-1 mb-2">
@@ -125,7 +159,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-muted">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 21:21'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 21:35'"></span>
          </div>
 
          <!-- List -->
@@ -147,7 +181,7 @@
                             <div x-text="post.department"></div>
                             <div class="text-primary" style="font-size: 0.75rem;" x-text="post.law_field"></div>
                         </div>
-                        <div class="text-end" style="font-size: 0.7rem; color: #666;">
+                        <div class="text-end" style="font-size: 0.7rem; color: #aaa;">
                              <div x-text="post.period.split('~')[1]?.trim()"></div>
                         </div>
                     </div>
@@ -159,31 +193,31 @@
          </div>
       </div>
 
-      <!-- [Pane 3] Detail View (Flex Fill) -->
-      <div class="flex-fill d-flex flex-column bg-darker position-relative min-w-0">
+      <!-- [Detail] Detail View (Slide-up on Mobile, Right Pane on Desktop) -->
+      <div class="detail-pane d-flex flex-column bg-darker" :class="{ 'mobile-active': selectedPost }">
           
-          <!-- Persistent Toolbar -->
+          <!-- Toolbar -->
           <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-dark-surface flex-shrink-0" style="min-height: 50px;">
               <div class="d-flex align-items-center gap-2 overflow-hidden">
                   <span class="badge bg-primary text-white rounded-0" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
                   <h3 class="m-0 text-white text-truncate" x-text="selectedPost ? selectedPost.title : 'LegalWard Pro'"></h3>
               </div>
               <div class="d-flex align-items-center gap-2">
-                  <!-- Loading Indicator -->
+                  <!-- Loading -->
                   <div x-show="loading" class="text-primary spinner-border spinner-border-sm" role="status"></div>
                   
                   <div class="d-flex gap-2" x-show="selectedPost">
                       <a :href="selectedPost?.link" target="_blank" class="btn btn-sm btn-outline-secondary text-white">
                           <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
-                          원문
+                          <span class="d-none d-md-inline ms-1">원문</span>
                       </a>
                       <button class="btn btn-sm btn-primary" @click="closeDetail()">닫기</button>
                   </div>
               </div>
           </div>
 
-          <!-- Tabs (Visible only when post selected) -->
-          <div class="d-flex border-bottom bg-dark-surface flex-shrink-0 ps-2" x-show="selectedPost">
+          <!-- Tabs -->
+          <div class="d-flex border-bottom bg-dark-surface flex-shrink-0 overflow-auto" x-show="selectedPost">
               <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">AI 인사이트</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'body' }" @click="activeTab = 'body'">본문</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'draft' }" @click="activeTab = 'draft'">법령안</div>
@@ -193,7 +227,6 @@
 
           <!-- Content Area -->
           <div class="flex-fill overflow-auto bg-darker p-4 position-relative">
-               <!-- Actual Content -->
                <div x-show="selectedPost && !loading">
                    <div x-show="activeTab === 'insight'" class="markdown-body" x-html="insightContent"></div>
                    <div x-show="activeTab === 'body'" class="markdown-body" x-html="bodyContent"></div>
@@ -202,10 +235,25 @@
                    <div x-show="activeTab === 'impact'" class="markdown-body" x-html="impactContent"></div>
                </div>
           </div>
-
       </div>
 
     </div>
+
+    <!-- [Mobile] Bottom Navigation -->
+    <nav class="mobile-bottom-nav">
+         <a href="#" class="d-flex flex-column align-items-center text-white text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l11 0" /><path d="M9 12l11 0" /><path d="M9 18l11 0" /><path d="M5 6l0 .01" /><path d="M5 12l0 .01" /><path d="M5 18l0 .01" /></svg>
+            <span style="font-size: 0.7rem;">입법예고</span>
+         </a>
+         <a href="#" class="d-flex flex-column align-items-center text-secondary text-decoration-none">
+            <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-star" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 17.75l-6.172 3.245l1.179 -6.873l-5 -4.867l6.9 -1l3.086 -6.253l3.086 6.253l6.9 1l-5 4.867l1.179 6.873z" /></svg>
+            <span style="font-size: 0.7rem;">즐겨찾기</span>
+         </a>
+         <a href="#" class="d-flex flex-column align-items-center text-secondary text-decoration-none">
+            <div class="avatar avatar-sm bg-secondary text-white rounded-0" style="width: 24px; height: 24px; font-size: 12px;">U</div>
+            <span style="font-size: 0.7rem;">내 정보</span>
+         </a>
+    </nav>
 
     <script>
         function app() {
@@ -230,7 +278,7 @@
                     law_field: 'all'
                 },
                 
-                activeTab: 'insight', // Persistent tab state
+                activeTab: 'insight', 
                 
                 fuse: null,
                 fuseOptions: {
@@ -300,12 +348,10 @@
                     this.selectedPost = post;
                     this.loading = true;
                     
-                    // Fallback: If no content loads within 5 seconds, force stop loading
                     const timeoutId = setTimeout(() => {
                         if (this.loading) {
                             console.warn('Fetch timed out');
                             this.loading = false;
-                            this.bodyContent = '<div class="alert alert-warning rounded-0">데이터 로딩 시간이 초과되었습니다.</div>';
                         }
                     }, 5000);
 
@@ -322,7 +368,7 @@
                         const res = await fetch(`data/${post.id}.json`);
                         
                         
-                        clearTimeout(timeoutId); // Clear timeout on success
+                        clearTimeout(timeoutId); 
 
                         if (!res.ok) throw new Error('Fetch failed');
                         
