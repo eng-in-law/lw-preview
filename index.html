@@ -153,7 +153,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 21:44'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 21:57'"></span>
          </div>
 
          <!-- List -->
@@ -225,7 +225,7 @@
 
           <!-- Tabs -->
           <div class="d-flex border-bottom bg-dark-surface flex-shrink-0 overflow-auto" x-show="selectedPost">
-              <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">AI 인사이트</div>
+              <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">요약 및 분석</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'body' }" @click="activeTab = 'body'">본문</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'draft' }" @click="activeTab = 'draft'">법령안</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'reason' }" @click="activeTab = 'reason'">제개정이유서</div>
