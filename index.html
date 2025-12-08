@@ -17,14 +17,17 @@
       @import url('https://rsms.me/inter/inter.css');
       :root {
       	--tblr-font-sans-serif: 'Inter', -apple-system, BlinkMacSystemFont, San Francisco, Segoe UI, Roboto, Helvetica Neue, sans-serif;
-        /* Oklch Colors - Natural & Uniform */
-        --tblr-primary: oklch(75% 0.18 220); /* Vibrant Cyan */
-        /* User Requested Dark Blue: rgb(0, 6, 31) -> oklch(0.1368 0.0571 260.47) */
-        --tblr-bg-surface-dark: oklch(13.68% 0.0571 260.47); 
-        --tblr-body-bg: oklch(0% 0 0); /* Pure Black */
-        --tblr-border-color: oklch(30% 0.03 260.47); /* Subtle Blue-Gray Border */
-        --tblr-body-color: oklch(98% 0 0); /* Near White */
-        --tblr-muted-color: oklch(70% 0.02 260.47); /* Readable Blue-Gray */
+        /* Oklch Colors */
+        --tblr-primary: oklch(75% 0.18 220); 
+        /* Reverted Surface to Dark Gray/Black (Panel Background) */
+        --tblr-bg-surface-dark: oklch(12% 0 0); 
+        --tblr-body-bg: oklch(0% 0 0);
+        --tblr-border-color: oklch(25% 0 0);
+        --tblr-body-color: oklch(98% 0 0);
+        --tblr-muted-color: oklch(70% 0 0);
+        
+        /* User Requested Deep Blue for Content Areas */
+        --tblr-bg-blue-deep: oklch(13.68% 0.0571 260.47);
       }
       body {
         background-color: var(--tblr-body-bg);
@@ -33,59 +36,64 @@
         font-size: 0.85rem;
       }
       
-      /* Global Contrast Overrides - NO DARK TEXT */
-      .text-muted { color: var(--tblr-muted-color) !important; }
-      .text-secondary { color: oklch(60% 0.03 260.47) !important; }
+      /* Global Contrast Overrides */
+      .text-muted { color: oklch(70% 0 0) !important; }
+      .text-secondary { color: oklch(60% 0 0) !important; }
       a.text-muted:hover { color: oklch(100% 0 0) !important; }
       .text-primary { color: var(--tblr-primary) !important; }
 
       /* Scrollbar */
       ::-webkit-scrollbar { width: 5px; height: 5px; }
       ::-webkit-scrollbar-track { background: var(--tblr-bg-surface-dark); }
-      ::-webkit-scrollbar-thumb { background: oklch(40% 0.05 260.47); border-radius: 0; }
-      ::-webkit-scrollbar-thumb:hover { background: oklch(50% 0.05 260.47); }
+      ::-webkit-scrollbar-thumb { background: oklch(40% 0 0); border-radius: 0; }
+      ::-webkit-scrollbar-thumb:hover { background: oklch(50% 0 0); }
 
       /* Layout Utilities */
       .h-100-dvh { height: 100dvh; }
       .border-end { border-right: 1px solid var(--tblr-border-color) !important; }
       .border-bottom { border-bottom: 1px solid var(--tblr-border-color) !important; }
-      .bg-dark-surface { background-color: var(--tblr-bg-surface-dark); }
-      .bg-darker { background-color: oklch(8% 0.04 260.47); } /* Darker shade of the theme blue */
+      
+      /* Background Classes */
+      .bg-dark-surface { background-color: var(--tblr-bg-surface-dark); } /* Sidebar, Toolbars (Black/Gray) */
+      .bg-blue-deep { background-color: var(--tblr-bg-blue-deep); } /* List & Content (Blue) */
+      .bg-darker { background-color: oklch(8% 0 0); } /* Fallback */
       
       /* Markdown Override */
-      .markdown-body { color: oklch(90% 0.01 260.47); line-height: 1.6; font-size: 0.9rem; }
+      .markdown-body { color: oklch(95% 0 0); line-height: 1.6; font-size: 0.9rem; }
       .markdown-body h1 { font-size: 1.3em; border-bottom: 1px solid var(--tblr-border-color); margin-top: 1em; margin-bottom: 0.5em; color: oklch(98% 0 0); font-weight: 700; }
-      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: oklch(92% 0.01 260.47); font-weight: 600; }
+      .markdown-body h2 { font-size: 1.15em; margin-top: 1em; margin-bottom: 0.5em; color: oklch(92% 0 0); font-weight: 600; }
       .markdown-body p { margin-bottom: 0.8em; }
       .markdown-body table { font-size: 0.85em; border: 1px solid var(--tblr-border-color); width: 100%; }
-      .markdown-body th { background-color: oklch(18% 0.05 260.47); color: oklch(98% 0 0); padding: 6px 10px; border: 1px solid var(--tblr-border-color); font-weight: 600; }
-      .markdown-body td { padding: 6px 10px; border: 1px solid var(--tblr-border-color); color: oklch(85% 0.01 260.47); }
+      .markdown-body th { background-color: oklch(18% 0 0); color: oklch(98% 0 0); padding: 6px 10px; border: 1px solid var(--tblr-border-color); font-weight: 600; }
+      .markdown-body td { padding: 6px 10px; border: 1px solid var(--tblr-border-color); color: oklch(90% 0 0); }
       .highlight { background-color: oklch(40% 0.15 220); color: oklch(98% 0 0); padding: 0 4px; border-radius: 2px; }
 
       /* Components */
-      .nav-link { border-radius: 0 !important; color: var(--tblr-muted-color); }
+      .nav-link { border-radius: 0 !important; color: oklch(70% 0 0); }
       .nav-link:hover { color: oklch(98% 0 0); }
-      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid var(--tblr-border-color) !important; padding: 0.75rem 0.8rem !important; background-color: transparent !important; color: oklch(98% 0 0); }
-      .list-group-item:hover { background-color: oklch(20% 0.06 260.47) !important; }
-      .list-group-item.active { background-color: oklch(25% 0.08 260.47) !important; border-left: 3px solid var(--tblr-primary); color: oklch(100% 0 0); }
-      .list-group-item.active .text-muted { color: oklch(80% 0.02 260.47) !important; }
       
-      .form-control-sm { border-radius: 0; background: oklch(18% 0.05 260.47); border: 1px solid var(--tblr-border-color); color: oklch(98% 0 0); }
-      .form-control-sm:focus { background: oklch(10% 0.04 260.47); border-color: var(--tblr-primary); color: oklch(100% 0 0); }
-      .form-control-sm::placeholder { color: oklch(55% 0.03 260.47); }
+      /* List Item - Transparent BG to show the Blue-Deep underneath */
+      .list-group-item { border-radius: 0 !important; border-bottom: 1px solid var(--tblr-border-color) !important; padding: 0.75rem 0.8rem !important; background-color: transparent !important; color: oklch(98% 0 0); }
+      .list-group-item:hover { background-color: oklch(20% 0.05 260.47) !important; } /* Slightly lighter blue on hover */
+      .list-group-item.active { background-color: oklch(25% 0.08 260.47) !important; border-left: 3px solid var(--tblr-primary); color: oklch(100% 0 0); }
+      .list-group-item.active .text-muted { color: oklch(85% 0 0) !important; }
+      
+      .form-control-sm { border-radius: 0; background: oklch(18% 0 0); border: 1px solid var(--tblr-border-color); color: oklch(98% 0 0); }
+      .form-control-sm:focus { background: oklch(10% 0 0); border-color: var(--tblr-primary); color: oklch(100% 0 0); }
+      .form-control-sm::placeholder { color: oklch(55% 0 0); }
       
       .btn { border-radius: 0; }
       .badge { border-radius: 0; font-weight: 600; }
       
-      /* Darker & Natural Badges (Oklch) */
-      .badge.bg-success { background-color: oklch(50% 0.15 145) !important; } /* Natural Green */
-      .badge.bg-danger { background-color: oklch(50% 0.18 25) !important; }   /* Natural Red */
-      .badge.bg-info { background-color: oklch(50% 0.15 250) !important; }     /* Natural Blue */
-      .badge.bg-orange { background-color: oklch(55% 0.18 50) !important; }    /* Natural Orange */
-      .badge.bg-secondary { background-color: oklch(35% 0 0) !important; }     /* Neutral Gray */
+      /* Badges */
+      .badge.bg-success { background-color: oklch(50% 0.15 145) !important; }
+      .badge.bg-danger { background-color: oklch(50% 0.18 25) !important; }
+      .badge.bg-info { background-color: oklch(50% 0.15 250) !important; }
+      .badge.bg-orange { background-color: oklch(60% 0.18 50) !important; }
+      .badge.bg-secondary { background-color: oklch(35% 0 0) !important; }
       
-      .tab-ht { border-bottom: 2px solid transparent; color: oklch(65% 0.02 260.47); padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
-      .tab-ht:hover { color: oklch(98% 0 0); background: oklch(18% 0.05 260.47); }
+      .tab-ht { border-bottom: 2px solid transparent; color: oklch(65% 0 0); padding: 10px 16px; font-weight: 600; font-size: 0.85rem; cursor: pointer; transition: color 0.2s; white-space: nowrap; }
+      .tab-ht:hover { color: oklch(98% 0 0); background: oklch(18% 0 0); }
       .tab-ht.active { color: var(--tblr-primary); border-bottom: 2px solid var(--tblr-primary); background: var(--tblr-bg-surface-dark); }
 
       /* --- RESPONSIVE LOGIC --- */
@@ -119,7 +127,7 @@
   <body class="theme-dark" x-data="app()" x-init="initApp()">
     <div class="d-flex h-100-dvh w-100 overflow-hidden">
       
-      <!-- [Desktop] Sidebar -->
+      <!-- [Desktop] Sidebar (Black/Dark Gray) -->
       <aside class="desktop-sidebar flex-column border-end bg-dark-surface align-items-center py-2" style="width: 60px; z-index: 20;">
         <div class="mb-4 text-primary">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-gavel" width="28" height="28" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M13 10l7.383 7.418c.823 .82 .823 2.148 0 2.967a2.11 2.11 0 0 1 -2.976 0l-7.407 -7.385" /><path d="M6 9l4 4" /><path d="M13 6l4 4" /><path d="M14 3l-9.3 9.3" /></svg>
@@ -137,10 +145,10 @@
         </div>
       </aside>
 
-      <!-- [Main] List View -->
-      <div class="list-pane d-flex flex-column border-end bg-dark-surface">
-         <!-- Header -->
-         <div class="p-2 border-bottom bg-darker">
+      <!-- [Main] List View (BLUE BG) -->
+      <div class="list-pane d-flex flex-column border-end bg-blue-deep">
+         <!-- Header (Darker/Black) -->
+         <div class="p-2 border-bottom bg-dark-surface">
              <div class="d-flex gap-1 mb-2">
                  <input type="text" x-model="searchQuery" x-ref="searchInput" class="form-control form-control-sm" placeholder="법령안 내용 검색">
                  <button class="btn btn-sm btn-icon btn-dark border border-secondary" @click="$refs.searchInput.focus()">
@@ -160,12 +168,12 @@
          </div>
 
          <!-- Status Bar -->
-         <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-secondary">
+         <div class="d-flex justify-content-between px-2 py-1 bg-dark-surface border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 09. 00:03'"></span>
+            <span x-text="'UPDATED: 2025. 12. 09. 00:10'"></span>
          </div>
 
-         <!-- List -->
+         <!-- List (Blue Content) -->
          <div class="list-group list-group-flush overflow-auto flex-fill scroll-y" id="feed-list">
              <template x-for="post in filteredPosts" :key="post.id">
                  <a href="#" class="list-group-item list-group-item-action" 
@@ -210,9 +218,9 @@
       </div>
 
       <!-- [Detail] Detail View (Slide-up on Mobile, Right Pane on Desktop) -->
-      <div class="detail-pane d-flex flex-column bg-darker" :class="{ 'mobile-active': selectedPost }">
+      <div class="detail-pane d-flex flex-column bg-blue-deep" :class="{ 'mobile-active': selectedPost }">
           
-          <!-- Toolbar -->
+          <!-- Toolbar (Black/Gray) -->
           <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-dark-surface flex-shrink-0" style="min-height: 50px;">
               <div class="d-flex align-items-center gap-2 overflow-hidden">
                   <span class="badge bg-primary text-dark rounded-0" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
@@ -232,7 +240,7 @@
               </div>
           </div>
 
-          <!-- Tabs -->
+          <!-- Tabs (Black/Gray) -->
           <div class="d-flex border-bottom bg-dark-surface flex-shrink-0 overflow-auto" x-show="selectedPost">
               <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">요약 및 분석</div>
               <div class="tab-ht" :class="{ 'active': activeTab === 'body' }" @click="activeTab = 'body'">본문</div>
@@ -241,8 +249,8 @@
               <div class="tab-ht" :class="{ 'active': activeTab === 'impact' }" @click="activeTab = 'impact'" x-show="impactContent">규제영향분석</div>
           </div>
 
-          <!-- Content Area -->
-          <div class="flex-fill overflow-auto bg-darker p-4 position-relative">
+          <!-- Content Area (Blue Deep) -->
+          <div class="flex-fill overflow-auto bg-blue-deep p-4 position-relative">
                <div x-show="selectedPost && !loading">
                    <div x-show="activeTab === 'insight'" class="markdown-body" x-html="insightContent"></div>
                    <div x-show="activeTab === 'body'" class="markdown-body" x-html="bodyContent"></div>
@@ -255,7 +263,7 @@
 
     </div>
 
-    <!-- [Mobile] Bottom Navigation -->
+    <!-- [Mobile] Bottom Navigation (Black/Gray) -->
     <nav class="mobile-bottom-nav">
          <a href="#" class="d-flex flex-column align-items-center text-white text-decoration-none">
             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-list" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M9 6l11 0" /><path d="M9 12l11 0" /><path d="M9 18l11 0" /><path d="M5 6l0 .01" /><path d="M5 12l0 .01" /><path d="M5 18l0 .01" /></svg>
