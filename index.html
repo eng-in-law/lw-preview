@@ -191,7 +191,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark-surface border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 09. 01:48'"></span>
+            <span x-text="'UPDATED: 2025. 12. 09. 02:06'"></span>
          </div>
 
          <!-- List (Blue Content) -->
@@ -246,7 +246,7 @@
               <!-- Toolbar (Black/Gray) -->
               <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom flex-shrink-0" style="min-height: 50px;">
                   <div class="d-flex align-items-center gap-2 overflow-hidden">
-                      <span class="badge bg-primary text-dark rounded-0" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
+                      <span class="badge bg-primary text-dark rounded-0 flex-shrink-0 text-nowrap px-2" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
                       <h3 class="m-0 text-white text-truncate" x-text="selectedPost ? selectedPost.title : 'LegalWard Pro'"></h3>
                   </div>
                   <div class="d-flex align-items-center gap-2">
@@ -258,7 +258,7 @@
                               <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
                               <span class="d-none d-md-inline ms-1">원문</span>
                           </a>
-                          <button class="btn btn-sm btn-primary text-dark fw-bold" @click="closeDetail()">닫기</button>
+                          <button class="btn btn-sm btn-danger text-white fw-bold px-3" @click="closeDetail()">닫기</button>
                       </div>
                   </div>
               </div>
@@ -274,7 +274,7 @@
           </div>
 
           <!-- Content Area (Blue Deep) -->
-          <div class="detail-body flex-fill overflow-auto bg-blue-deep p-4 position-relative">
+          <div class="detail-body flex-fill overflow-auto bg-blue-deep p-2 p-md-4 position-relative">
                <div x-show="selectedPost && !loading">
                    <div x-show="activeTab === 'insight'" class="markdown-body" x-html="insightContent"></div>
                    <div x-show="activeTab === 'body'" class="markdown-body" x-html="bodyContent"></div>
