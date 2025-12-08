@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>입법예고 대시보드 Pro</title>
+    <title>입법예고 대시보드</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.basic.min.js"></script>
@@ -17,24 +17,31 @@
                         gray: { 750: '#2d2d2d', 850: '#1a1a1a', 900: '#121212', 950: '#0a0a0a' },
                         purple: { 500: '#8b5cf6', 600: '#7c3aed' }
                     },
-                    // 모바일 브라우저 높이 대응
                     height: { 'screen-dvh': '100dvh' } 
                 }
             }
         }
     </script>
     <style>
-        /* 스크롤바 커스텀 */
+        /* Custom scrollbar */
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #121212; }
         ::-webkit-scrollbar-thumb { background: #374151; border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: #4b5563; }
         
-        /* 모바일에서 텍스트 선택 방지 (앱 같은 느낌) */
         .no-select { user-select: none; -webkit-user-select: none; }
-        
-        /* 슬라이드 애니메이션 */
         .slide-panel { transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1); }
+
+        /* Scoped markdown styles */
+        .markdown-body h1 { font-size: 1.5rem; font-weight: bold; margin-top: 1.5rem; margin-bottom: 1rem; color: #e5e7eb; }
+        .markdown-body h2 { font-size: 1.25rem; font-weight: bold; margin-top: 1.2rem; margin-bottom: 0.8rem; color: #e5e7eb; }
+        .markdown-body h3 { font-size: 1.1rem; font-weight: bold; margin-top: 1rem; margin-bottom: 0.6rem; color: #e5e7eb; }
+        .markdown-body p { margin-bottom: 1rem; line-height: 1.6; color: #d1d5db; }
+        .markdown-body table { width: 100%; border-collapse: collapse; margin-bottom: 1rem; }
+        .markdown-body th, .markdown-body td { border: 1px solid #374151; padding: 0.5rem; color: #d1d5db; }
+        .markdown-body th { background-color: #1f2937; }
+        .markdown-body ul, .markdown-body ol { margin-bottom: 1rem; padding-left: 1.5rem; list-style-type: disc; color: #d1d5db; }
+        .markdown-body > div { margin-bottom: 1rem; line-height: 1.6; color: #d1d5db; }
     </style>
 </head>
 <body class="bg-[#121212] text-gray-100 font-sans antialiased overflow-hidden h-screen-dvh selection:bg-purple-500 selection:text-white"
@@ -43,6 +50,10 @@
 
     <div class="flex h-full w-full relative">
 
+        <!-- Mobile Navigation Overlay -->
+        <div x-show="isNavOpen" @click="isNavOpen = false" class="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm" x-transition.opacity></div>
+
+        <!-- Sidebar Navigation -->
         <div x-show="isNavOpen || window.innerWidth >= 768" 
              class="fixed md:static inset-y-0 left-0 z-40 w-64 bg-[#1a1a1a] border-r border-gray-800 flex flex-col transform transition-transform duration-300 md:transform-none"
              :class="isNavOpen ? 'translate-x-0' : '-translate-x-full md:translate-x-0'">
@@ -59,24 +70,26 @@
                 </button>
             </div>
 
+            <div class="px-5 pb-4">
+                 <p class="text-xs text-gray-400 font-semibold tracking-wide">UPDATED: 2025. 12. 08. 14:00</p>
+            </div>
+
             <nav class="flex-1 px-3 space-y-1 overflow-y-auto">
                 <a href="#" class="flex items-center px-3 py-2.5 bg-gray-800 text-white rounded-lg group">
                     <svg class="w-5 h-5 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 13a2 2 0 01-2-2V7m2 13a2 2 0 002-2V9a2 2 0 00-2-2h-2m-4-3H9M7 16h6M7 8h6v4H7V8z"></path></svg>
                     <span class="font-medium text-sm">입법예고</span>
                 </a>
-                </nav>
+            </nav>
 
             <div class="p-4 border-t border-gray-800">
                 <div class="flex items-center">
-                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold">U</div>
+                    <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-purple-500 to-blue-500 flex items-center justify-center text-xs font-bold text-white">U</div>
                     <div class="ml-3">
                         <p class="text-sm font-medium text-white">Pro User</p>
                     </div>
                 </div>
             </div>
         </div>
-
-        <div x-show="isNavOpen" @click="isNavOpen = false" class="fixed inset-0 bg-black/50 z-30 md:hidden backdrop-blur-sm" x-transition.opacity></div>
 
 
         <main class="flex-1 flex flex-col min-w-0 bg-[#121212] relative z-0">
@@ -88,85 +101,196 @@
                 <span class="font-bold text-lg">입법예고</span>
             </div>
 
+            <!-- Search & Filter Header -->
             <div class="p-4 border-b border-gray-800 bg-[#121212]">
                 <div class="relative max-w-2xl mx-auto">
                     <input type="text" x-model="searchQuery" placeholder="법안 키워드 검색..." 
-                           class="w-full bg-[#1e1e1e] border border-gray-700 text-gray-200 text-sm rounded-full focus:ring-2 focus:ring-purple-600 focus:border-transparent block pl-10 p-3 transition-shadow">
+                           class="w-full bg-[#1e1e1e] border border-gray-700 text-gray-200 text-sm rounded-full focus:ring-2 focus:ring-purple-600 focus:border-transparent block pl-10 p-3 transition-shadow placeholder-gray-500">
                     <div class="absolute inset-y-0 left-0 flex items-center pl-3 pointer-events-none">
                         <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
                     </div>
+                    <template x-if="searchQuery">
+                        <button @click="searchQuery = ''; activeFilters = { department: 'all', law_type: 'all', law_field: 'all' };" class="absolute inset-y-0 right-0 flex items-center pr-3 text-gray-400 hover:text-white">
+                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                        </button>
+                    </template>
                 </div>
+                
                 <div class="flex gap-2 mt-3 overflow-x-auto pb-1 no-scrollbar justify-center">
                     <select x-model="activeFilters.department" class="bg-[#1e1e1e] text-xs text-gray-400 rounded-lg border border-gray-700 py-1.5 px-3 focus:outline-none focus:border-purple-500">
                         <option value="all">모든 부처</option>
                         <template x-for="dep in filters.departments" :key="dep"><option :value="dep" x-text="dep"></option></template>
                     </select>
-                    </div>
+                    <select x-model="activeFilters.law_type" class="bg-[#1e1e1e] text-xs text-gray-400 rounded-lg border border-gray-700 py-1.5 px-3 focus:outline-none focus:border-purple-500">
+                        <option value="all">모든 종류</option>
+                        <template x-for="type in filters.law_types" :key="type"><option :value="type" x-text="type"></option></template>
+                    </select>
+                     <select x-model="activeFilters.law_field" class="bg-[#1e1e1e] text-xs text-gray-400 rounded-lg border border-gray-700 py-1.5 px-3 focus:outline-none focus:border-purple-500">
+                        <option value="all">모든 분야</option>
+                        <template x-for="field in filters.law_fields" :key="field"><option :value="field" x-text="field"></option></template>
+                    </select>
+                </div>
             </div>
 
+            <!-- Feed List -->
             <div class="flex-1 overflow-y-auto p-4 space-y-3 scroll-smooth" id="feed-list">
                 <template x-for="post in filteredPosts" :key="post.id">
                     <div @click="openDetail(post)" 
-                         class="bg-[#1e1e1e] hover:bg-[#252525] rounded-xl p-4 cursor-pointer border border-transparent hover:border-purple-500/30 transition-all duration-200 active:scale-[0.99]">
+                         class="bg-[#1e1e1e] hover:bg-[#252525] rounded-xl p-4 cursor-pointer border border-transparent hover:border-purple-500/30 transition-all duration-200 active:scale-[0.99] group shadow-sm">
                         <div class="flex items-start justify-between">
-                            <div class="flex-1">
-                                <div class="flex items-center gap-2 mb-1.5">
-                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-700 text-gray-300" x-text="post.department"></span>
-                                    <span class="text-[10px] text-purple-400 font-medium" x-text="post.law_field"></span>
-                                    <span class="text-[10px] text-gray-500">•</span>
-                                    <span class="text-[10px] text-gray-500" x-text="getDDayString(post)"></span>
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-2 mb-1.5 flex-wrap">
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded bg-gray-700 text-gray-300 whitespace-nowrap" x-text="post.department"></span>
+                                    <span class="text-[10px] text-purple-400 font-medium whitespace-nowrap" x-text="post.law_field"></span>
+                                    
+                                     <!-- D-Day Badge -->
+                                    <span class="text-[10px] font-bold px-1.5 py-0.5 rounded shadow-sm whitespace-nowrap"
+                                          :class="getDDayColor(post)"
+                                          x-text="getDDayString(post)"></span>
+                                    
+                                    <!-- Amendment Type Badge -->
+                                    <template x-if="post.amendment_type">
+                                        <span class="px-1.5 py-0.5 rounded text-[10px] font-bold border border-opacity-30 whitespace-nowrap"
+                                              :class="{
+                                                  'bg-green-900 text-green-300 border-green-500': post.amendment_type === '제정',
+                                                  'bg-red-900 text-red-300 border-red-500': post.amendment_type === '전부개정',
+                                                  'bg-blue-900 text-blue-300 border-blue-500': post.amendment_type === '일부개정'
+                                              }"
+                                              x-text="post.amendment_type"></span>
+                                    </template>
                                 </div>
-                                <h3 class="text-base font-bold text-gray-100 leading-snug mb-1" x-html="post.highlightedTitle || post.title"></h3>
-                                <p class="text-xs text-gray-500 line-clamp-2">클릭하여 상세 내용과 규제영향분석서를 확인하세요.</p>
+                                
+                                <h3 class="text-base font-bold text-gray-100 leading-snug mb-1 group-hover:text-purple-400 transition-colors break-keep" x-html="post.highlightedTitle || post.title"></h3>
+                                
+                                <p class="text-xs text-gray-500 line-clamp-2 mt-1.5">
+                                    <template x-if="post.keywords && post.keywords.length > 0">
+                                        <span>핵심어: 
+                                            <template x-for="(keyword, index) in post.keywords.slice(0, 7)" :key="index">
+                                                <span class="text-gray-400 hover:text-purple-300 transition-colors mr-1" x-text="keyword + (index < Math.min(post.keywords.length, 7) - 1 ? ',' : '')"></span>
+                                            </template>
+                                        </span>
+                                    </template>
+                                    <template x-if="!post.keywords || post.keywords.length === 0">
+                                        <span>상세 내용을 확인하려면 클릭하세요.</span>
+                                    </template>
+                                </p>
                             </div>
                             <div class="ml-3 flex flex-col items-center min-w-[40px]">
-                                <div class="text-xs font-bold text-purple-400 mb-1">▲ <span x-text="post.upvotes"></span></div>
+                                <div class="bg-gray-800 rounded-lg px-2 py-1 flex flex-col items-center group-hover:bg-gray-700 transition-colors">
+                                    <div class="text-[10px] font-bold text-purple-400 mb-0.5" x-text="`▲ ${post.upvotes}`"></div>
+                                    <div class="w-full h-[1px] bg-gray-600 mb-0.5"></div>
+                                    <div class="text-[10px] font-bold text-gray-500" x-text="`▼ ${post.downvotes}`"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </template>
                 
                 <div x-show="filteredPosts.length === 0" class="text-center py-20 text-gray-500">
+                    <svg class="mx-auto h-10 w-10 text-gray-700 mb-2" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
                     <p>검색 결과가 없습니다.</p>
                 </div>
+                
+                 <!-- Bottom Spacer -->
+                <div class="h-10"></div>
             </div>
         </main>
 
-
-        <div class="fixed inset-y-0 right-0 z-50 flex" 
-             style="pointer-events: none;"> <div x-show="selectedPost" 
+        <!-- Right Sliding Sidebar -->
+        <div class="fixed inset-y-0 right-0 z-50 flex pointer-events-none">
+            <div x-show="selectedPost" 
                  x-transition:enter="transform transition ease-out duration-300"
                  x-transition:enter-start="translate-x-full"
                  x-transition:enter-end="translate-x-0"
                  x-transition:leave="transform transition ease-in duration-200"
                  x-transition:leave-start="translate-x-0"
                  x-transition:leave-end="translate-x-full"
-                 class="w-full md:w-[600px] lg:w-[800px] bg-[#1a1a1a] h-full shadow-2xl border-l border-gray-700 flex flex-col pointer-events-auto"
+                 class="w-full md:w-[600px] lg:w-[900px] bg-[#1a1a1a] h-full shadow-2xl border-l border-gray-700 flex flex-col pointer-events-auto"
             >
+                <!-- Detail Header -->
                 <div class="h-14 px-4 border-b border-gray-700 flex items-center justify-between bg-[#1a1a1a] shrink-0">
                     <button @click="closeDetail()" class="p-2 -ml-2 text-gray-400 hover:text-white rounded-full hover:bg-gray-800">
                         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
                     </button>
                     <div class="flex space-x-2">
-                         <button class="text-xs bg-purple-600 text-white px-3 py-1.5 rounded-full font-bold">의견 등록</button>
+                         <a :href="selectedPost?.link" target="_blank" class="text-xs bg-gray-800 hover:bg-gray-700 text-gray-300 px-3 py-1.5 rounded-full font-bold transition-colors flex items-center">
+                             원문 보기
+                             <svg class="w-3 h-3 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                         </a>
+                         <button class="text-xs bg-purple-600 hover:bg-purple-500 text-white px-3 py-1.5 rounded-full font-bold transition-colors">의견 등록</button>
                     </div>
                 </div>
 
-                <div class="flex-1 overflow-y-auto p-6 md:p-8 bg-[#121212]" x-data="{ tab: 'insight' }">
-                    <div x-show="selectedPost">
-                        <h2 class="text-xl md:text-2xl font-bold mb-4 leading-tight" x-text="selectedPost.title"></h2>
-                        
-                        <div class="flex border-b border-gray-700 mb-6">
-                            <button @click="tab = 'insight'" :class="tab === 'insight' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500'" class="pb-2 px-4 text-sm font-medium border-b-2 transition-colors">요약</button>
-                            <button @click="tab = 'original'" :class="tab === 'original' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500'" class="pb-2 px-4 text-sm font-medium border-b-2 transition-colors">원문</button>
+                <!-- Detail Content -->
+                <div class="flex-1 overflow-y-auto bg-[#121212] flex flex-col" x-data="{ activeTab: 'insight' }">
+                    
+                    <div class="p-6 md:p-8 pb-0">
+                         <div class="flex items-center space-x-2 mb-2">
+                             <span class="text-purple-400 text-xs font-bold" x-text="selectedPost?.law_field"></span>
+                             <span class="text-gray-600 text-xs">•</span>
+                             <span class="text-gray-400 text-xs" x-text="selectedPost?.department"></span>
+                         </div>
+                        <h2 class="text-xl md:text-2xl font-bold mb-6 leading-tight text-white" x-text="selectedPost?.title"></h2>
+
+                         <!-- Tabs -->
+                        <div class="flex border-b border-gray-700 mb-6 overflow-x-auto no-scrollbar">
+                            <button x-show="insightContent"
+                                    @click="activeTab = 'insight'" 
+                                    :class="activeTab === 'insight' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-300'" 
+                                    class="pb-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0">
+                                인사이트
+                            </button>
+                            <button @click="activeTab = 'body'" 
+                                    :class="activeTab === 'body' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-300'" 
+                                    class="pb-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0">
+                                본문
+                            </button>
+                            <button @click="activeTab = 'draft'" 
+                                    :class="activeTab === 'draft' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-300'" 
+                                    class="pb-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0">
+                                법령안
+                            </button>
+                            <button x-show="impactContent"
+                                    @click="activeTab = 'impact'" 
+                                    :class="activeTab === 'impact' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-300'" 
+                                    class="pb-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0">
+                                규제영향분석서
+                            </button>
+                            <button @click="activeTab = 'reason'" 
+                                    :class="activeTab === 'reason' ? 'border-purple-500 text-purple-400' : 'border-transparent text-gray-500 hover:text-gray-300'" 
+                                    class="pb-3 px-4 text-sm font-medium border-b-2 transition-colors whitespace-nowrap flex-shrink-0">
+                                제개정 이유서
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="px-6 md:px-8 pb-10 flex-1">
+                         <div x-show="loading" class="flex justify-center items-center h-40">
+                            <svg class="animate-spin h-8 w-8 text-purple-500" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                            </svg>
                         </div>
 
-                        <div x-show="tab === 'insight'" class="prose prose-invert prose-sm max-w-none">
-                            <p class="text-gray-300 leading-relaxed">
-                                이 법안은 <span x-text="selectedPost.department"></span>에서 발의했습니다. 
-                                주요 내용은... (여기에 AI 요약이나 상세 데이터가 들어갑니다).
-                            </p>
-                            </div>
+                        <div x-show="!loading && activeTab === 'insight'" class="animate-fade-in">
+                            <div class="markdown-body" x-html="insightContent"></div>
+                        </div>
+
+                        <div x-show="!loading && activeTab === 'body'" class="animate-fade-in">
+                             <div class="markdown-body" x-html="bodyContent"></div>
+                        </div>
+
+                        <div x-show="!loading && activeTab === 'draft'" class="animate-fade-in">
+                             <div class="markdown-body" x-html="draftContent"></div>
+                        </div>
+
+                        <div x-show="!loading && activeTab === 'impact'" class="animate-fade-in">
+                            <div class="markdown-body" x-html="impactContent"></div>
+                       </div>
+                        
+                        <div x-show="!loading && activeTab === 'reason'" class="animate-fade-in">
+                            <div class="markdown-body" x-html="reasonContent"></div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -180,67 +304,175 @@
                 isNavOpen: false,
                 searchQuery: '',
                 selectedPost: null,
-                activeFilters: { department: 'all' },
                 
-                // [중요] 데이터는 실제 환경에선 fetch로 가져와야 합니다.
-                // 편의상 기존 데이터를 여기에 붙여넣으세요.
-                allPosts: [
-                    {"id": "1", "title": "예시: 노후계획도시 정비 및 지원에 관한 특별법", "department": "국토교통부", "law_field": "도시", "upvotes": 120, "end_date_ts": 1768834799000},
-                    {"id": "2", "title": "예시: 건축법 시행령 일부개정령안", "department": "국토교통부", "law_field": "건축", "upvotes": 45, "end_date_ts": 1768834799000},
-                    // ... (선생님의 기존 긴 데이터 배열을 여기에 넣으세요) ...
-                ],
+                // Fetch State
+                loading: false,
+                bodyContent: '',
+                draftContent: '',
+                reasonContent: '',
+                impactContent: '',
+                insightContent: '',
+                
+                // Data Injected from Build Script
+                allPosts: [{"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84732", "keywords": [], "law_field": "\uad6d\ud1a0\uac1c\ubc1c\u318d\ub3c4\uc2dc", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84732?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\ub178\ud6c4\uacc4\ud68d\ub3c4\uc2dc \uc815\ube44 \ubc0f \uc9c0\uc6d0\uc5d0 \uad00\ud55c \ud2b9\ubcc4\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "265"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84730", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84730?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\uac74\ucd95\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 4, "views": "457"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84728", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84728?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\uac74\ucd95\ubb3c\uc758 \ud53c\ub09c\u00b7\ubc29\ud654\uad6c\uc870 \ub4f1\uc758 \uae30\uc900\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 3, "views": "383"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc18c\ubc29\uccad", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84726", "keywords": [], "law_field": "\ubbfc\ubc29\uc704\u318d\uc18c\ubc29", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84726?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\uc18c\ubc29\uae30\ubcf8\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 3, "views": "393"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84724", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84724?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\ub3c5\ub9bd\uc720\uacf5\uc790\uc608\uc6b0\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "299"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84722", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84722?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\uad6d\uac00\uc720\uacf5\uc790 \ub4f1 \uc608\uc6b0 \ubc0f \uc9c0\uc6d0\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 3, "views": "319"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84720", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84720?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\ubcf4\ud6c8\ubcf4\uc0c1\ub300\uc0c1\uc790\uc758 \uc9c0\uc6d0\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "290"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84718", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84718?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\ucc38\uc804\uc720\uacf5\uc790 \uc608\uc6b0 \ubc0f \ub2e8\uccb4\uc124\ub9bd\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "237"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84716", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84716?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\uace0\uc5fd\uc81c\ud6c4\uc720\uc758\uc99d \ub4f1 \ud658\uc790\uc9c0\uc6d0 \ubc0f \ub2e8\uccb4\uc124\ub9bd\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "246"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84714", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84714?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "5\u00b718\ubbfc\uc8fc\uc720\uacf5\uc790\uc608\uc6b0 \ubc0f \ub2e8\uccb4\uc124\ub9bd\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "221"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84680", "keywords": [], "law_field": "\ub18d\uc5c5", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84680?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\ub18d\uc5c5\u00b7\ub18d\ucd0c \uacf5\uc775\uae30\ub2a5 \uc99d\uc9c4 \uc9c1\uc811\uc9c0\ubd88\uc81c\ub3c4 \uc6b4\uc601\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "209"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84678", "keywords": [], "law_field": "\ubcf4\uac74\u318d\uc758\uc0ac", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84678?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\uad6d\ubbfc\uac74\uac15\uc99d\uc9c4\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "232"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud574\uc591\uc218\uc0b0\ubd80", "downvotes": 5, "end_date_ts": 1768402799000, "id": "84676", "keywords": [], "law_field": "\ud574\uc6b4", "law_type": "\ubc95\ub960", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84676?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uc120\ubc15\uc758 \uc785\ud56d \ubc0f \ucd9c\ud56d \ub4f1\uc5d0 \uad00\ud55c \ubc95\ub960 \uc77c\ubd80\uac1c\uc815\ubc95\ub960\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 28, "views": "2,866"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud574\uc591\uc218\uc0b0\ubd80", "downvotes": 5, "end_date_ts": 1768402799000, "id": "84674", "keywords": [], "law_field": "\ud574\uc6b4", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84674?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uc120\ubc15\uc9c1\uc6d0\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 26, "views": "2,605"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud6c4\uc5d0\ub108\uc9c0\ud658\uacbd\ubd80", "downvotes": 39, "end_date_ts": 1766415599000, "id": "84672", "keywords": [], "law_field": "\ud658\uacbd", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84672?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2025. 12. 22.", "status": "active", "title": "\ud3d0\uae30\ubb3c\uad00\ub9ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 199, "views": "19,979"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 6, "end_date_ts": 1766415599000, "id": "84670", "keywords": [], "law_field": "\ub0b4\uad6d\uc138", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84670?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2025. 12. 22.", "status": "active", "title": "\ubd80\uac00\uac00\uce58\uc138\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 34, "views": "3,433"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 8, "end_date_ts": 1768402799000, "id": "84668", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84668?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\ucd08\u00b7\uc911\ub4f1\uad50\uc721\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 40, "views": "4,094"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 43, "end_date_ts": 1768402799000, "id": "84666", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ubc95\ub960", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84666?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uad50\uc721\uacf5\ubb34\uc6d0\ubc95 \uc77c\ubd80\uac1c\uc815\ubc95\ub960\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 215, "views": "21,594"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 6, "end_date_ts": 1768402799000, "id": "84664", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ubc95\ub960", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84664?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uc0ac\ub9bd\ud559\uad50\ubc95 \uc77c\ubd80\uac1c\uc815\ubc95\ub960\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 33, "views": "3,315"}, {"amendment_type": "\uc81c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 6, "end_date_ts": 1767020399000, "id": "84662", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84662?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2025. 12. 29.", "status": "active", "title": "\uc0b0\ub9bc\uc7ac\ub09c\ubc29\uc9c0\ubc95 \uc2dc\ud589\ub839 \uc81c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 32, "views": "3,207"}, {"amendment_type": "\uc81c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 37, "end_date_ts": 1767020399000, "id": "84660", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84660?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2025. 12. 29.", "status": "active", "title": "\uc0b0\ub9bc\uc7ac\ub09c\ubc29\uc9c0\ubc95 \uc2dc\ud589\uaddc\uce59 \uc81c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 185, "views": "18,511"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uace0\uc6a9\ub178\ub3d9\ubd80", "downvotes": 20, "end_date_ts": 1768402799000, "id": "84658", "keywords": [], "law_field": "\ub178\ub3d9", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84658?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\ud55c\uad6d\uc0b0\uc5c5\uc778\ub825\uacf5\ub2e8\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 104, "views": "10,454"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "downvotes": 6, "end_date_ts": 1768402799000, "id": "84656", "keywords": [], "law_field": "\ub18d\uc5c5", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84656?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\ub18d\uc9c0\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 30, "views": "3,057"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 6, "end_date_ts": 1768402799000, "id": "84654", "keywords": [], "law_field": "\uc0ac\ud68c\ubcf5\uc9c0", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84654?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uad6d\ubbfc\uac74\uac15\ubcf4\ud5d8 \uc694\uc591\uae09\uc5ec\uc758 \uae30\uc900\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 30, "views": "3,046"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 36, "end_date_ts": 1768402799000, "id": "84652", "keywords": [], "law_field": "\uc0ac\ud68c\ubcf5\uc9c0", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84652?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 5.~2026. 1. 14.", "status": "active", "title": "\uad6d\ubbfc\uac74\uac15\ubcf4\ud5d8\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 182, "views": "18,282"}, {"amendment_type": "", "department": "\uae08\uc735\uc704\uc6d0\ud68c", "downvotes": 13, "end_date_ts": 1768316399000, "id": "84650", "keywords": [], "law_field": "\ud1b5\ud654\u318d\uad6d\ucc44\u318d\uae08\uc735", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84650?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2026. 1. 13.", "status": "active", "title": "\uc790\ubcf8\uc2dc\uc7a5\uacfc \uae08\uc735\ud22c\uc790\uc5c5\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0 \ubc0f \uae08\uc735\ud22c\uc790\uc5c5\uaddc\uc815 \uc77c\ubd80\uac1c\uc815\uace0\uc2dc\uc548\uaddc\uc815\ubcc0\uacbd\uc608\uace0\uc77c\ubd80", "upvotes": 66, "views": "6,618"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc131\ud3c9\ub4f1\uac00\uc871\ubd80", "downvotes": 5, "end_date_ts": 1768402799000, "id": "84648", "keywords": [], "law_field": "\uc0ac\ud68c\ubcf5\uc9c0", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84648?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2026. 1. 14.", "status": "active", "title": "\uac00\uc815\ud3ed\ub825\ubc29\uc9c0 \ubc0f \ud53c\ud574\uc790\ubcf4\ud638 \ub4f1\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 26, "views": "2,663"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 5, "end_date_ts": 1766501999000, "id": "84646", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84646?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2025. 12. 23.", "status": "active", "title": "\uad00\uc138\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 29, "views": "2,921"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc678\uad50\ubd80", "downvotes": 8, "end_date_ts": 1767193199000, "id": "84644", "keywords": [], "law_field": "\uc678\ubb34", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84644?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2025. 12. 31.", "status": "active", "title": "\uc7ac\uc678\uacf5\uad00 \uc8fc\uc7ac\uad00 \uc784\uc6a9\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 44, "views": "4,425"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ubb34\uc870\uc815\uc2e4", "downvotes": 55, "end_date_ts": 1768316399000, "id": "84642", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ubc95\ub960", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84642?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2026. 1. 13.", "status": "active", "title": "\uaddc\uc81c \uc7ac\uac80\ud1a0\uae30\ud55c \uc815\ube44\ub97c \uc704\ud55c 141\uac1c \ubc95\ub839\uc758 \uc77c\ubd80\uac1c\uc815\uc5d0 \uad00\ud55c \ub300\ud1b5\ub839\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 275, "views": "27,529"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud6c4\uc5d0\ub108\uc9c0\ud658\uacbd\ubd80", "downvotes": 14, "end_date_ts": 1768229999000, "id": "84640", "keywords": [], "law_field": "\uc5d0\ub108\uc9c0\uc774\uc6a9\u318d\uad11\uc5c5", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84640?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 1. 12.", "status": "active", "title": "\uc2e0\uc5d0\ub108\uc9c0 \ubc0f \uc7ac\uc0dd\uc5d0\ub108\uc9c0 \uac1c\ubc1c\u318d\uc774\uc6a9\u318d\ubcf4\uae09 \ucd09\uc9c4\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 72, "views": "7,251"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\uc5c5\ud1b5\uc0c1\ubd80", "downvotes": 8, "end_date_ts": 1770389999000, "id": "84638", "keywords": [], "law_field": "\uacf5\uc5c5\uaddc\uaca9\u318d\uacc4\ub7c9", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84638?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 2. 6.", "status": "active", "title": "\uc804\uae30\uc6a9\ud488 \ubc0f \uc0dd\ud65c\uc6a9\ud488 \uc548\uc804\uad00\ub9ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 42, "views": "4,214"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 9, "end_date_ts": 1770821999000, "id": "84636", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84636?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 2. 11.", "status": "active", "title": "\uc720\ub8cc\ub3c4\ub85c\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 46, "views": "4,693"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 9, "end_date_ts": 1770821999000, "id": "84634", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84634?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 2. 11.", "status": "active", "title": "\uc720\ub8cc\ub3c4\ub85c\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 46, "views": "4,693"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\uac00\ubcf4\ud6c8\ubd80", "downvotes": 0, "end_date_ts": 1766069999000, "id": "84632", "keywords": [], "law_field": "\uad6d\uac00\ubcf4\ud6c8", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84632?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 18.", "status": "active", "title": "\ud2b9\uc218\uc784\ubb34\uc720\uacf5\uc790 \uc608\uc6b0 \ubc0f \ub2e8\uccb4\uc124\ub9bd\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "218"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubc95\ubb34\ubd80", "downvotes": 0, "end_date_ts": 1765810799000, "id": "84630", "keywords": [], "law_field": "\ubc95\ubb34", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84630?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2025. 12. 15.", "status": "active", "title": "\uac80\uc0ac\uc758 \uc218\uc0ac\uac1c\uc2dc \ubc94\uc8c4 \ubc94\uc704\uc5d0 \uad00\ud55c \uaddc\uc815 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc7ac\uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "226"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "downvotes": 0, "end_date_ts": 1768834799000, "id": "84628", "keywords": [], "law_field": "\ub18d\uc5c5", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84628?finishIncludeYn=Y\u0026edYd=20251208\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 8.~2026. 1. 19.", "status": "active", "title": "\ub18d\uc5c5\u00b7\ub18d\ucd0c \uacf5\uc775\uae30\ub2a5 \uc99d\uc9c4 \uc9c1\uc811\uc9c0\ubd88\uc81c\ub3c4 \uc6b4\uc601\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 2, "views": "210"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc6d0\uc790\ub825\uc548\uc804\uc704\uc6d0\ud68c", "downvotes": 5, "end_date_ts": 1765465199000, "id": "84626", "keywords": [], "law_field": "\uacfc\ud559\u318d\uae30\uc220", "law_type": "\ucd1d\ub9ac\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84626?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=1\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 4.~2025. 12. 11.", "status": "active", "title": "\uc6d0\uc790\ub825\uc548\uc804\uc704\uc6d0\ud68c\uc640 \uadf8 \uc18c\uc18d\uae30\uad00 \uc9c1\uc81c \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 25, "views": "2,564"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "downvotes": 42, "end_date_ts": 1767884399000, "id": "84624", "keywords": [], "law_field": "\ucd95\uc0b0", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84624?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 8.", "status": "active", "title": "\uc591\ubd09\uc0b0\uc5c5\uc758 \uc721\uc131 \ubc0f \uc9c0\uc6d0\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 211, "views": "21,152"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 36, "end_date_ts": 1764946799000, "id": "84622", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84622?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2025. 12. 5.", "status": "closed", "title": "\uc0b0\ub9bc\uccad\uacfc \uadf8 \uc18c\uc18d\uae30\uad00 \uc9c1\uc81c \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 183, "views": "18,336"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud589\uc815\uc548\uc804\ubd80", "downvotes": 33, "end_date_ts": 1765205999000, "id": "84620", "keywords": [], "law_field": "\ud589\uc815\uc77c\ubc18", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84620?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2025. 12. 8.", "status": "active", "title": "\ud589\uc815\uc5c5\ubb34\uc758 \uc6b4\uc601 \ubc0f \ud601\uc2e0\uc5d0 \uad00\ud55c \uaddc\uc815 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 168, "views": "16,894"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 38, "end_date_ts": 1767884399000, "id": "84618", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84618?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 8.", "status": "active", "title": "\ucd08\u00b7\uc911\ub4f1\uad50\uc721\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 192, "views": "19,257"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uace0\uc6a9\ub178\ub3d9\ubd80", "downvotes": 43, "end_date_ts": 1767797999000, "id": "84616", "keywords": [], "law_field": "\ub178\ub3d9", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84616?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 7.", "status": "active", "title": "\uadfc\ub85c\ubcf5\uc9c0\uae30\ubcf8\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 216, "views": "21,618"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uace0\uc6a9\ub178\ub3d9\ubd80", "downvotes": 32, "end_date_ts": 1767797999000, "id": "84614", "keywords": [], "law_field": "\ub178\ub3d9", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84614?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 7.", "status": "active", "title": "\uadfc\ub85c\ubcf5\uc9c0\uae30\ubcf8\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 164, "views": "16,405"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc911\uc18c\ubca4\ucc98\uae30\uc5c5\ubd80", "downvotes": 37, "end_date_ts": 1766501999000, "id": "84612", "keywords": [], "law_field": "\uc0c1\uc5c5\u318d\ubb34\uc5ed\u318d\uacf5\uc5c5", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84612?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2025. 12. 23.", "status": "active", "title": "\uc911\uc18c\uae30\uc5c5\ucc3d\uc5c5 \uc9c0\uc6d0\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 186, "views": "18,643"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 37, "end_date_ts": 1767797999000, "id": "84610", "keywords": [], "law_field": "\uc57d\uc0ac", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84610?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 7.", "status": "active", "title": "\uc57d\uc0ac\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 187, "views": "18,742"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 37, "end_date_ts": 1767797999000, "id": "84608", "keywords": [], "law_field": "\ubcf4\uac74\u318d\uc758\uc0ac", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84608?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 7.", "status": "active", "title": "\uc758\ub8cc\uae30\uae30 \uc720\ud1b5 \ubc0f \ud310\ub9e4\uc9c8\uc11c \uc720\uc9c0\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 186, "views": "18,672"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 30, "end_date_ts": 1767797999000, "id": "84606", "keywords": [], "law_field": "\uc57d\uc0ac", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84606?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 28.~2026. 1. 7.", "status": "active", "title": "\uc57d\uc0ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 154, "views": "15,411"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud574\uc591\uc218\uc0b0\ubd80", "downvotes": 29, "end_date_ts": 1767711599000, "id": "84604", "keywords": [], "law_field": "\ud658\uacbd", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84604?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\ud574\uc591\ud658\uacbd\uad00\ub9ac\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 149, "views": "14,990"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 30, "end_date_ts": 1767711599000, "id": "84602", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84602?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\uc720\uc544\uad50\uc721\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 151, "views": "15,107"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubc95\uc81c\ucc98", "downvotes": 29, "end_date_ts": 1765465199000, "id": "84598", "keywords": [], "law_field": "\uad70\uc0ac", "law_type": "\ucd1d\ub9ac\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84598?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2025. 12. 11.", "status": "active", "title": "\uc8fc\ud55c\ubbf8\uad70 \uc18c\uc18d \ud55c\uad6d\uc778 \uadfc\ub85c\uc790\uc758 \uc9c0\uc6d0\uc744 \uc704\ud55c \ud2b9\ubcc4\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc7ac\uc785\ubc95\uc608\uace0", "upvotes": 149, "views": "14,902"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae08\uc735\uc704\uc6d0\ud68c", "downvotes": 30, "end_date_ts": 1767711599000, "id": "84596", "keywords": [], "law_field": "\ubbfc\uc0ac\ubc95", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84596?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\uc8fc\uc2dd\ud68c\uc0ac \ub4f1\uc758 \uc678\ubd80\uac10\uc0ac\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 154, "views": "15,468"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 33, "end_date_ts": 1767625199000, "id": "84594", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84594?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 26.~2026. 1. 5.", "status": "active", "title": "\uacf5\uacf5\uc8fc\ud0dd \ud2b9\ubcc4\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 169, "views": "16,982"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud589\uc815\uc548\uc804\ubd80", "downvotes": 7, "end_date_ts": 1765205999000, "id": "84592", "keywords": [], "law_field": "\uacfc\ud559\u318d\uae30\uc220", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84592?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2025. 12. 8.", "status": "active", "title": "\uc6d0\uc790\ub825\uc548\uc804\uc704\uc6d0\ud68c\uc640 \uadf8 \uc18c\uc18d\uae30\uad00 \uc9c1\uc81c \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 38, "views": "3,813"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubb38\ud654\uccb4\uc721\uad00\uad11\ubd80", "downvotes": 14, "end_date_ts": 1768229999000, "id": "84590", "keywords": [], "law_field": "\uc815\ubcf4\ud1b5\uc2e0", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84590?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 1. 12.", "status": "active", "title": "\ucf58\ud150\uce20\uc0b0\uc5c5 \uc9c4\ud765\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 70, "views": "7,005"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "downvotes": 7, "end_date_ts": 1768229999000, "id": "84588", "keywords": [], "law_field": "\ubcf4\uac74\u318d\uc758\uc0ac", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84588?finishIncludeYn=Y\u0026edYd=20251206\u0026pageIndex=2\u0026stYd=20250101\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 3.~2026. 1. 12.", "status": "active", "title": "\uc7a5\uc0ac \ub4f1\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 38, "views": "3,865"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\uc0c1\uccad", "downvotes": 32, "end_date_ts": 1765292399000, "id": "84586", "keywords": [], "law_field": "\uacfc\ud559\u318d\uae30\uc220", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84586?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2025. 12. 9.", "status": "active", "title": "\uae30\uc0c1\uccad\uacfc \uadf8 \uc18c\uc18d\uae30\uad00 \uc9c1\uc81c \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 161, "views": "16,115"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 4, "end_date_ts": 1768229999000, "id": "84584", "keywords": [], "law_field": "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84584?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2026. 1. 12.", "status": "active", "title": "\uacf5\uacf5\uc8fc\ud0dd \ud2b9\ubcc4\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 21, "views": "2,124"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 10, "end_date_ts": 1766415599000, "id": "84582", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84582?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2025. 12. 22.", "status": "active", "title": "\uad00\uc138\ubc95 \uc81c68\uc870\uc5d0 \ub530\ub978 \ud2b9\ubcc4\uae34\uae09\uad00\uc138 \ubd80\uacfc\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 50, "views": "5,050"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 7, "end_date_ts": 1765551599000, "id": "84580", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84580?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2025. 12. 12.", "status": "active", "title": "\uad00\uc138\ubc95 \uc81c71\uc870\uc5d0 \ub530\ub978 \ud560\ub2f9\uad00\uc138\uc758 \uc801\uc6a9\uc5d0 \uad00\ud55c \uaddc\uc815 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 35, "views": "3,531"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 34, "end_date_ts": 1765551599000, "id": "84578", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84578?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2025. 12. 12.", "status": "active", "title": "\uad00\uc138\ubc95 \uc81c69\uc870\uc5d0 \ub530\ub978 \uc870\uc815\uad00\uc138\uc758 \uc801\uc6a9\uc5d0 \uad00\ud55c \uaddc\uc815 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 171, "views": "17,122"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 29, "end_date_ts": 1766415599000, "id": "84576", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84576?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 2.~2025. 12. 22.", "status": "active", "title": "\uc2dc\uc7a5\uc811\uadfc\ubb3c\ub7c9 \uc99d\ub7c9\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 149, "views": "14,959"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 13, "end_date_ts": 1768229999000, "id": "84574", "keywords": [], "law_field": "\uad6d\ud1a0\uac1c\ubc1c\u318d\ub3c4\uc2dc", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84574?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2026. 1. 12.", "status": "active", "title": "\uac1c\ubc1c\uc81c\ud55c\uad6c\uc5ed\uc758 \uc9c0\uc815 \ubc0f \uad00\ub9ac\uc5d0 \uad00\ud55c \ud2b9\ubcc4\uc870\uce58\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 69, "views": "6,903"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 35, "end_date_ts": 1765810799000, "id": "84572", "keywords": [], "law_field": "\ub0b4\uad6d\uc138", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84572?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2025. 12. 15.", "status": "active", "title": "\uc99d\uad8c\uac70\ub798\uc138\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 179, "views": "17,989"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 13, "end_date_ts": 1765810799000, "id": "84570", "keywords": [], "law_field": "\ub0b4\uad6d\uc138", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84570?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2025. 12. 15.", "status": "active", "title": "\uc18c\ub4dd\uc138\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 67, "views": "6,713"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud589\uc815\uc548\uc804\ubd80", "downvotes": 35, "end_date_ts": 1768229999000, "id": "84568", "keywords": [], "law_field": "\ubbfc\ubc29\uc704\u318d\uc18c\ubc29", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84568?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2026. 1. 12.", "status": "active", "title": "\ud48d\uc218\ud574\u00b7\uc9c0\uc9c4\uc7ac\ud574\ubcf4\ud5d8\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 175, "views": "17,504"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uacbd\ucc30\uccad", "downvotes": 35, "end_date_ts": 1768229999000, "id": "84566", "keywords": [], "law_field": "\uacbd\ucc30", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84566?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2026. 1. 12.", "status": "active", "title": "\ub3c4\ub85c\uad50\ud1b5\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 178, "views": "17,818"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uacbd\ucc30\uccad", "downvotes": 19, "end_date_ts": 1768229999000, "id": "84564", "keywords": [], "law_field": "\uacbd\ucc30", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84564?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=1\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 12. 1.~2026. 1. 12.", "status": "active", "title": "\ub3c4\ub85c\uad50\ud1b5\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 97, "views": "9,711"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ud574\uc591\uc218\uc0b0\ubd80", "downvotes": 38, "end_date_ts": 1767711599000, "id": "84562", "keywords": [], "law_field": "\ud658\uacbd", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84562?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\ud574\uc591\ud658\uacbd\uad00\ub9ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 194, "views": "19,463"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uacf5\uc815\uac70\ub798\uc704\uc6d0\ud68c", "downvotes": 25, "end_date_ts": 1767711599000, "id": "84560", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ucd1d\ub9ac\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84560?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\uaddc\uc81c\uc77c\ubab0 \ud574\uc81c \ub4f1\uc744 \uc704\ud55c \ubc29\ubb38\ud310\ub9e4 \ub4f1\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 127, "views": "12,768"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 38, "end_date_ts": 1767711599000, "id": "84558", "keywords": [], "law_field": "\uc0ac\ud68c\ubcf5\uc9c0", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84558?finishIncludeYn=Y\u0026edYd=20251202\u0026pageIndex=2\u0026stYd=20251126\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 27.~2026. 1. 6.", "status": "active", "title": "\uc601\uc720\uc544\ubcf4\uc721\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 191, "views": "19,128"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubb38\ud654\uccb4\uc721\uad00\uad11\ubd80", "downvotes": 21, "end_date_ts": 1766156399000, "id": "84536", "keywords": [], "law_field": "\uc721\uc6b4\u318d\ud56d\uacf5\u318d\uad00\uad11", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84536?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 19.", "status": "active", "title": "\uad00\uad11\uc9c4\ud765\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 105, "views": "10,598"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 30, "end_date_ts": 1767193199000, "id": "84534", "keywords": [], "law_field": "\uc721\uc6b4\u318d\ud56d\uacf5\u318d\uad00\uad11", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84534?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc790\ub3d9\ucc28\uad00\ub9ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 154, "views": "15,443"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc18c\ubc29\uccad", "downvotes": 26, "end_date_ts": 1767193199000, "id": "84532", "keywords": [], "law_field": "\ubbfc\ubc29\uc704\u318d\uc18c\ubc29", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84532?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc18c\ubc29\ub825 \uae30\uc900\uc5d0 \uad00\ud55c \uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 131, "views": "13,127"}, {"amendment_type": "\uc81c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 21, "end_date_ts": 1764773999000, "id": "84530", "keywords": [], "law_field": "\uad00\uc138", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84530?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 3.", "status": "closed", "title": "\uc911\uad6d\uc0b0 \ucc28\uc544\ud669\uc0b0\uc18c\ub2e4\uc5d0 \ub300\ud55c \ub364\ud551\ubc29\uc9c0\uad00\uc138 \ubd80\uacfc\uc5d0 \uad00\ud55c \uaddc\uce59 \uc81c\uc815\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 108, "views": "10,820"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 21, "end_date_ts": 1767193199000, "id": "84528", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84528?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc0b0\ub9bc\uc790\uc6d0\uc758 \uc870\uc131 \ubc0f \uad00\ub9ac\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 107, "views": "10,755"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 20, "end_date_ts": 1767193199000, "id": "84526", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84526?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc0b0\ub9bc\uad50\uc721\uc758 \ud65c\uc131\ud654\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 104, "views": "10,422"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 21, "end_date_ts": 1767193199000, "id": "84524", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84524?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc0b0\ub9bc\ubb38\ud654 \ud734\uc591\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 109, "views": "10,945"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 21, "end_date_ts": 1767193199000, "id": "84522", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84522?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\ubaa9\uc7ac\uc758 \uc9c0\uc18d\uac00\ub2a5\ud55c \uc774\uc6a9\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 105, "views": "10,581"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uc0b0\ub9bc\uccad", "downvotes": 20, "end_date_ts": 1767193199000, "id": "84520", "keywords": [], "law_field": "\uc0b0\ub9bc", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84520?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uc784\uc5c5 \ubc0f \uc0b0\ucd0c \uc9c4\ud765\ucd09\uc9c4\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 100, "views": "10,022"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ubc29\ubd80", "downvotes": 19, "end_date_ts": 1767193199000, "id": "84518", "keywords": [], "law_field": "\uad70\uc0ac", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84518?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uad70\ubb34\uc6d0\uc778\uc0ac\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 99, "views": "9,977"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ubc29\ubd80", "downvotes": 19, "end_date_ts": 1767193199000, "id": "84516", "keywords": [], "law_field": "\uad70\uc0ac", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84516?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\uad70\ubb34\uc6d0\uc778\uc0ac\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 97, "views": "9,738"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "downvotes": 16, "end_date_ts": 1767193199000, "id": "84514", "keywords": [], "law_field": "\ub18d\uc5c5", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84514?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 21.~2025. 12. 31.", "status": "active", "title": "\ub18d\uc5b4\uc5c5\uc7ac\ud574\ubcf4\ud5d8\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 81, "views": "8,184"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\ubb38\ud654\uccb4\uc721\uad00\uad11\ubd80", "downvotes": 29, "end_date_ts": 1767106799000, "id": "84486", "keywords": [], "law_field": "\ubb38\ud654\u318d\uacf5\ubcf4", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84486?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 20.~2025. 12. 30.", "status": "active", "title": "\uac8c\uc784\uc0b0\uc5c5\uc9c4\ud765\uc5d0 \uad00\ud55c \ubc95\ub960 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 148, "views": "14,842"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uae30\ud68d\uc7ac\uc815\ubd80", "downvotes": 14, "end_date_ts": 1767106799000, "id": "84484", "keywords": [], "law_field": "\uc7ac\uc815\u318d\uacbd\uc81c\uc77c\ubc18", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84484?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 20.~2025. 12. 30.", "status": "active", "title": "\uacf5\uae30\uc5c5\u00b7\uc900\uc815\ubd80\uae30\uad00 \uacc4\uc57d\uc0ac\ubb34\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 71, "views": "7,154"}, {"amendment_type": "\uc81c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 28, "end_date_ts": 1767106799000, "id": "84482", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84482?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 20.~2025. 12. 30.", "status": "active", "title": "\ub3c4\uc2dc\ud615\ucea0\ud37c\uc2a4 \uc124\ub9bd\u00b7\uc6b4\uc601\uc5d0 \uad00\ud55c \ud2b9\ubcc4\ubc95 \uc2dc\ud589\uaddc\uce59 \uc81c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 142, "views": "14,286"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 38, "end_date_ts": 1767106799000, "id": "84480", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84480?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 20.~2025. 12. 30.", "status": "active", "title": "\uace0\ub4f1\uad50\uc721\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 192, "views": "19,273"}, {"amendment_type": "\uc81c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 21, "end_date_ts": 1767106799000, "id": "84478", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84478?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 20.~2025. 12. 30.", "status": "active", "title": "\ub300\ud559\uc218\ud559\ub2a5\ub825\uc2dc\ud5d8 \ucd9c\uc81c\uc704\uc6d0 \uc9c0\uc815\u00b7\uc704\ucd09\uc5d0 \uad00\ud55c \uaddc\uce59 \uc81c\uc815\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 107, "views": "10,779"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 31, "end_date_ts": 1767020399000, "id": "84476", "keywords": [], "law_field": "\uc721\uc6b4\u318d\ud56d\uacf5\u318d\uad00\uad11", "law_type": "\ubd80\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84476?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 19.~2025. 12. 29.", "status": "active", "title": "\ud56d\uacf5\uc548\uc804\ubc95 \uc2dc\ud589\uaddc\uce59 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 155, "views": "15,555"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad6d\ud1a0\uad50\ud1b5\ubd80", "downvotes": 24, "end_date_ts": 1767020399000, "id": "84474", "keywords": [], "law_field": "\uc218\uc790\uc6d0\u318d\ud1a0\uc9c0\u318d\uac74\uc124\uc5c5", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84474?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 19.~2025. 12. 29.", "status": "active", "title": "\uac74\uc124\uae30\uc220 \uc9c4\ud765\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 120, "views": "12,010"}, {"amendment_type": "\uc81c\uc815", "department": "\uad6d\uac00\ub370\uc774\ud130\ucc98", "downvotes": 27, "end_date_ts": 1767020399000, "id": "84432", "keywords": [], "law_field": "\uc815\ubcf4\uc5c6\uc74c", "law_type": "\ucd1d\ub9ac\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84432?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=1\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 19.~2025. 12. 29.", "status": "active", "title": "\uad6d\uac00\ub370\uc774\ud130\ucc98 \uc18c\uad00 \ube44\uc601\ub9ac\ubc95\uc778\uc758 \uc124\ub9bd \ubc0f \uac10\ub3c5\uc5d0 \uad00\ud55c \uaddc\uce59 \uc81c\uc815\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 139, "views": "13,972"}, {"amendment_type": "\uc77c\ubd80\uac1c\uc815", "department": "\uad50\uc721\ubd80", "downvotes": 20, "end_date_ts": 1767020399000, "id": "84430", "keywords": [], "law_field": "\uad50\uc721\u318d\ud559\uc220", "law_type": "\ub300\ud1b5\ub839\ub839", "link": "https://opinion.lawmaking.go.kr/gcom/ogLmPp/84430?finishIncludeYn=Y\u0026edYd=20251121\u0026pageIndex=2\u0026stYd=20251115\u0026chkFinishIncludeYn=on\u0026btnType=1", "period": "2025. 11. 19.~2025. 12. 29.", "status": "active", "title": "\ucd08\uc911\ub4f1\uad50\uc721\ubc95 \uc2dc\ud589\ub839 \uc77c\ubd80\uac1c\uc815\ub839\uc548 \uc785\ubc95\uc608\uace0", "upvotes": 101, "views": "10,143"}],
+                filters: {"departments": ["\uacbd\ucc30\uccad", "\uace0\uc6a9\ub178\ub3d9\ubd80", "\uacf5\uc815\uac70\ub798\uc704\uc6d0\ud68c", "\uad50\uc721\ubd80", "\uad6d\uac00\ub370\uc774\ud130\ucc98", "\uad6d\uac00\ubcf4\ud6c8\ubd80", "\uad6d\ubb34\uc870\uc815\uc2e4", "\uad6d\ubc29\ubd80", "\uad6d\ud1a0\uad50\ud1b5\ubd80", "\uae08\uc735\uc704\uc6d0\ud68c", "\uae30\uc0c1\uccad", "\uae30\ud68d\uc7ac\uc815\ubd80", "\uae30\ud6c4\uc5d0\ub108\uc9c0\ud658\uacbd\ubd80", "\ub18d\ub9bc\ucd95\uc0b0\uc2dd\ud488\ubd80", "\ubb38\ud654\uccb4\uc721\uad00\uad11\ubd80", "\ubc95\ubb34\ubd80", "\ubc95\uc81c\ucc98", "\ubcf4\uac74\ubcf5\uc9c0\ubd80", "\uc0b0\ub9bc\uccad", "\uc0b0\uc5c5\ud1b5\uc0c1\ubd80", "\uc131\ud3c9\ub4f1\uac00\uc871\ubd80", "\uc18c\ubc29\uccad", "\uc678\uad50\ubd80", "\uc6d0\uc790\ub825\uc548\uc804\uc704\uc6d0\ud68c", "\uc911\uc18c\ubca4\ucc98\uae30\uc5c5\ubd80", "\ud574\uc591\uc218\uc0b0\ubd80", "\ud589\uc815\uc548\uc804\ubd80"], "law_fields": ["\uacbd\ucc30", "\uacf5\uc5c5\uaddc\uaca9\u318d\uacc4\ub7c9", "\uacfc\ud559\u318d\uae30\uc220", "\uad00\uc138", "\uad50\uc721\u318d\ud559\uc220", "\uad6d\uac00\ubcf4\ud6c8", "\uad6d\ud1a0\uac1c\ubc1c\u318d\ub3c4\uc2dc", "\uad70\uc0ac", "\ub0b4\uad6d\uc138", "\ub178\ub3d9", "\ub18d\uc5c5", "\ubb38\ud654\u318d\uacf5\ubcf4", "\ubbfc\ubc29\uc704\u318d\uc18c\ubc29", "\ubbfc\uc0ac\ubc95", "\ubc95\ubb34", "\ubcf4\uac74\u318d\uc758\uc0ac", "\uc0ac\ud68c\ubcf5\uc9c0", "\uc0b0\ub9bc", "\uc0c1\uc5c5\u318d\ubb34\uc5ed\u318d\uacf5\uc5c5", "\uc218\uc790\uc6d0\u318d\ud1a0\uc9c0\u318d\uac74\uc124\uc5c5", "\uc57d\uc0ac", "\uc5d0\ub108\uc9c0\uc774\uc6a9\u318d\uad11\uc5c5", "\uc678\ubb34", "\uc721\uc6b4\u318d\ud56d\uacf5\u318d\uad00\uad11", "\uc7ac\uc815\u318d\uacbd\uc81c\uc77c\ubc18", "\uc815\ubcf4\uc5c6\uc74c", "\uc815\ubcf4\ud1b5\uc2e0", "\uc8fc\ud0dd\u318d\uac74\ucd95\u318d\ub3c4\ub85c", "\ucd95\uc0b0", "\ud1b5\ud654\u318d\uad6d\ucc44\u318d\uae08\uc735", "\ud574\uc6b4", "\ud589\uc815\uc77c\ubc18", "\ud658\uacbd"], "law_types": ["\ub300\ud1b5\ub839\ub839", "\ubc95\ub960", "\ubd80\ub839", "\ucd1d\ub9ac\ub839"]},
                 
                 filteredPosts: [],
-                filters: {
-                    departments: ["국토교통부", "환경부", "교육부", "기획재정부"] // 예시 데이터
+                activeFilters: {
+                    department: 'all',
+                    law_type: 'all',
+                    law_field: 'all'
                 },
+                
                 fuse: null,
+                fuseOptions: {
+                    keys: [
+                        { name: 'title', weight: 0.7 },
+                        { name: 'department', weight: 0.3 },
+                        { name: 'law_field', weight: 0.3 },
+                        { name: 'law_type', weight: 0.3 },
+                        { name: 'keywords', weight: 0.2 },
+                        { name: 'id', weight: 0.1 }
+                    ],
+                    threshold: 0.3,
+                    ignoreLocation: true
+                },
 
                 initApp() {
-                    // Fuse.js 검색 설정 (가볍게)
-                    this.fuse = new Fuse(this.allPosts, {
-                        keys: ['title', 'department'],
-                        threshold: 0.4
-                    });
-                    this.filterPosts();
+                    // Initialize Fuse.js
+                    this.fuse = new Fuse(this.allPosts, this.fuseOptions);
                     
-                    // 필터나 검색어 변경 시 자동 실행
+                    // Watchers
                     this.$watch('searchQuery', () => this.filterPosts());
-                    this.$watch('activeFilters.department', () => this.filterPosts());
+                    this.$watch('activeFilters', () => this.filterPosts());
+                    this.$watch('activeFilters.department', () => this.filterPosts()); // Deep watch helper
+                    
+                    // Initial Filter
+                    this.filterPosts();
                 },
 
                 filterPosts() {
                     let result = this.allPosts;
                     
-                    // 1. 부처 필터
-                    if(this.activeFilters.department !== 'all') {
-                        result = result.filter(p => p.department === this.activeFilters.department);
-                    }
-
-                    // 2. 검색어 필터
+                    // 1. Search
                     if(this.searchQuery.length > 0) {
                         result = this.fuse.search(this.searchQuery).map(r => {
-                            // 하이라이팅 로직 단순화 (필요시 추가)
-                            return { ...r.item, highlightedTitle: r.item.title.replace(this.searchQuery, `<span class="text-purple-400">${this.searchQuery}</span>`) };
+                            let item = { ...r.item };
+                            item.highlightedTitle = this.highlightMatch(item.title, r.matches);
+                            return item;
                         });
+                    } else {
+                        // Reset highlights
+                         result = result.map(item => {
+                            let newItem = { ...item };
+                            newItem.highlightedTitle = item.title;
+                            return newItem;
+                        });
+                    }
+                    
+                    // 2. Filters
+                    if (this.activeFilters.department !== 'all') {
+                        result = result.filter(p => p.department === this.activeFilters.department);
+                    }
+                    if (this.activeFilters.law_type !== 'all') {
+                        result = result.filter(p => p.law_type === this.activeFilters.law_type);
+                    }
+                    if (this.activeFilters.law_field !== 'all') {
+                        result = result.filter(p => p.law_field === this.activeFilters.law_field);
                     }
 
                     this.filteredPosts = result;
                 },
+                
+                highlightMatch(text, matches) {
+                    if (!matches || matches.length === 0) return text;
+                    // Simple highlighting strategy for title matches
+                    const titleMatch = matches.find(m => m.key === 'title');
+                    if (!titleMatch) return text;
+                    
+                    let result = '';
+                    let lastIndex = 0;
+                    
+                    // Fuse returns matches as [start, end] pairs
+                    titleMatch.indices.forEach(([start, end]) => {
+                        result += text.substring(lastIndex, start);
+                        result += `<span class="text-purple-400 bg-purple-900/30 rounded px-0.5">${text.substring(start, end + 1)}</span>`;
+                        lastIndex = end + 1;
+                    });
+                    
+                    result += text.substring(lastIndex);
+                    return result;
+                },
 
-                openDetail(post) {
+                async openDetail(post) {
                     this.selectedPost = post;
-                    // 모바일 주소창 색상 변경 등 UX 처리 가능
+                    this.loading = true;
+                    // Reset Contents
+                    this.bodyContent = '';
+                    this.draftContent = '';
+                    this.reasonContent = '';
+                    this.impactContent = '';
+                    this.insightContent = '';
+                    
+                    try {
+                        // Fetch detail JSON
+                        
+                        const res = await fetch(`data/${post.id}.json`);
+                        
+                        
+                        if (!res.ok) throw new Error('Fetch failed');
+                        
+                        const data = await res.json();
+                        this.bodyContent = data.body || '<p class="text-gray-500">본문 내용이 없습니다.</p>';
+                        this.draftContent = data.draft;
+                        this.reasonContent = data.reason;
+                        this.impactContent = data.impact;
+                        this.insightContent = data.insight;
+                        
+                    } catch (e) {
+                        console.error(e);
+                        this.bodyContent = '<p class="text-red-400">내용을 불러오는데 실패했습니다.</p>';
+                    } finally {
+                        this.loading = false;
+                    }
                 },
 
                 closeDetail() {
                     this.selectedPost = null;
                 },
 
-                // 날짜 계산 헬퍼
+                // D-Day Logic
+                getDDay(post) {
+                    if (post.status === 'closed') return -1;
+                    if (!post.end_date_ts) return null;
+                    
+                    const now = new Date();
+                    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+                    const endDate = new Date(post.end_date_ts);
+                    const target = new Date(endDate.getFullYear(), endDate.getMonth(), endDate.getDate());
+                    
+                    const diffTime = target - today;
+                    return Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                },
+                
                 getDDayString(post) {
-                    // (간단 구현)
-                    return "D-14"; 
+                    if (post.status === 'closed') return "마감";
+                    const days = this.getDDay(post);
+                    if (days === null) return "";
+                    if (days < 0) return "마감";
+                    if (days === 0) return "오늘마감";
+                    return "D-" + days;
+                },
+                
+                getDDayColor(post) {
+                    if (post.status === 'closed') return "bg-gray-800 text-gray-500 border border-gray-700";
+                    const days = this.getDDay(post);
+                    if (days === null) return "bg-gray-800 text-gray-500 border border-gray-700";
+                    if (days < 0) return "bg-gray-800 text-gray-500 border border-gray-700";
+                    if (days === 0) return "bg-red-600 text-white font-extrabold animate-pulse border border-red-500";
+                    if (days <= 3) return "bg-red-900 text-red-200 border border-red-700 font-bold";
+                    if (days <= 7) return "bg-yellow-900 text-yellow-200 border border-yellow-700 font-bold";
+                    return "bg-green-900 text-green-200 border border-green-700 font-bold";
                 }
             }
         }
