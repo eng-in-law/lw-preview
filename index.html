@@ -12,6 +12,8 @@
     <script src="https://unpkg.com/alpinejs@3.x.x/dist/cdn.min.js" defer></script>
     <!-- Fuse.js -->
     <script src="https://cdn.jsdelivr.net/npm/fuse.js/dist/fuse.basic.min.js"></script>
+    <!-- Headroom.js -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/headroom/0.12.0/headroom.min.js"></script>
     
     <style>
       @import url('https://rsms.me/inter/inter.css');
@@ -102,6 +104,12 @@
       .list-pane { width: 380px; flex-shrink: 0; }
       .detail-pane { position: relative; flex: 1; min-width: 0; }
       
+      /* Headroom Animation */
+      .navbar-headroom { will-change: transform; transition: transform 200ms linear; }
+      .headroom--pinned { transform: translateY(0%); }
+      .headroom--unpinned { transform: translateY(-100%); }
+      .mobile-bottom-nav.headroom--unpinned { transform: translateY(100%); }
+      
       @media (max-width: 768px) {
           .desktop-sidebar { display: none !important; }
           .mobile-bottom-nav { 
@@ -109,8 +117,11 @@
               position: fixed; bottom: 0; left: 0; width: 100%; height: 60px;
               background-color: var(--tblr-bg-surface-dark); border-top: 1px solid var(--tblr-border-color); z-index: 3000;
               justify-content: space-around; align-items: center;
+              transition: transform 200ms linear; /* Enable animation for bottom bar */
           }
           .list-pane { width: 100% !important; border-right: none !important; padding-bottom: 60px; }
+          
+          /* Mobile Detail View */
           .detail-pane {
               position: fixed !important; 
               top: 0; left: 0; width: 100%; height: 100%;
@@ -120,6 +131,16 @@
               background-color: var(--tblr-body-bg);
           }
           .detail-pane.mobile-active { transform: translateY(0) !important; }
+          
+          /* Fixed Header for Headroom on Mobile */
+          .detail-header {
+              position: fixed; top: 0; left: 0; width: 100%; z-index: 2050;
+              background-color: var(--tblr-bg-surface-dark);
+          }
+          /* Add padding to body so content isn't hidden behind fixed header */
+          .detail-body {
+              padding-top: 90px; /* Toolbar(50) + Tabs(40 approx) */
+          }
       }
       [x-cloak] { display: none !important; }
     </style>
@@ -170,7 +191,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark-surface border-bottom small text-secondary">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 09. 00:32'"></span>
+            <span x-text="'UPDATED: 2025. 12. 09. 00:40'"></span>
          </div>
 
          <!-- List (Blue Content) -->
@@ -220,37 +241,40 @@
       <!-- [Detail] Detail View (Slide-up on Mobile, Right Pane on Desktop) -->
       <div class="detail-pane d-flex flex-column bg-blue-deep" :class="{ 'mobile-active': selectedPost }">
           
-          <!-- Toolbar (Black/Gray) -->
-          <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom bg-dark-surface flex-shrink-0" style="min-height: 50px;">
-              <div class="d-flex align-items-center gap-2 overflow-hidden">
-                  <span class="badge bg-primary text-dark rounded-0" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
-                  <h3 class="m-0 text-white text-truncate" x-text="selectedPost ? selectedPost.title : 'LegalWard Pro'"></h3>
-              </div>
-              <div class="d-flex align-items-center gap-2">
-                  <!-- Loading -->
-                  <div x-show="loading" class="text-primary spinner-border spinner-border-sm" role="status"></div>
-                  
-                  <div class="d-flex gap-2" x-show="selectedPost">
-                      <a :href="selectedPost?.link" target="_blank" class="btn btn-sm btn-outline-secondary text-white">
-                          <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
-                          <span class="d-none d-md-inline ms-1">원문</span>
-                      </a>
-                      <button class="btn btn-sm btn-primary text-dark fw-bold" @click="closeDetail()">닫기</button>
+          <!-- [WRAPPER] Detail Header (Toolbar + Tabs) for Headroom -->
+          <div class="detail-header bg-dark-surface">
+              <!-- Toolbar (Black/Gray) -->
+              <div class="d-flex align-items-center justify-content-between px-3 py-2 border-bottom flex-shrink-0" style="min-height: 50px;">
+                  <div class="d-flex align-items-center gap-2 overflow-hidden">
+                      <span class="badge bg-primary text-dark rounded-0" x-show="selectedPost" x-text="selectedPost?.law_type"></span>
+                      <h3 class="m-0 text-white text-truncate" x-text="selectedPost ? selectedPost.title : 'LegalWard Pro'"></h3>
+                  </div>
+                  <div class="d-flex align-items-center gap-2">
+                      <!-- Loading -->
+                      <div x-show="loading" class="text-primary spinner-border spinner-border-sm" role="status"></div>
+                      
+                      <div class="d-flex gap-2" x-show="selectedPost">
+                          <a :href="selectedPost?.link" target="_blank" class="btn btn-sm btn-outline-secondary text-white">
+                              <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-external-link" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M12 6h-6a2 2 0 0 0 -2 2v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2 -2v-6" /><path d="M11 13l9 -9" /><path d="M15 4h5v5" /></svg>
+                              <span class="d-none d-md-inline ms-1">원문</span>
+                          </a>
+                          <button class="btn btn-sm btn-primary text-dark fw-bold" @click="closeDetail()">닫기</button>
+                      </div>
                   </div>
               </div>
-          </div>
 
-          <!-- Tabs (Black/Gray) -->
-          <div class="d-flex border-bottom bg-dark-surface flex-shrink-0 overflow-auto" x-show="selectedPost">
-              <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">요약 및 분석</div>
-              <div class="tab-ht" :class="{ 'active': activeTab === 'body' }" @click="activeTab = 'body'">본문</div>
-              <div class="tab-ht" :class="{ 'active': activeTab === 'draft' }" @click="activeTab = 'draft'">법령안</div>
-              <div class="tab-ht" :class="{ 'active': activeTab === 'reason' }" @click="activeTab = 'reason'">제개정이유서</div>
-              <div class="tab-ht" :class="{ 'active': activeTab === 'impact' }" @click="activeTab = 'impact'" x-show="impactContent">규제영향분석</div>
+              <!-- Tabs (Black/Gray) -->
+              <div class="d-flex border-bottom flex-shrink-0 overflow-auto" x-show="selectedPost">
+                  <div class="tab-ht" :class="{ 'active': activeTab === 'insight' }" @click="activeTab = 'insight'" x-show="insightContent">요약 및 분석</div>
+                  <div class="tab-ht" :class="{ 'active': activeTab === 'body' }" @click="activeTab = 'body'">본문</div>
+                  <div class="tab-ht" :class="{ 'active': activeTab === 'draft' }" @click="activeTab = 'draft'">법령안</div>
+                  <div class="tab-ht" :class="{ 'active': activeTab === 'reason' }" @click="activeTab = 'reason'">제개정이유서</div>
+                  <div class="tab-ht" :class="{ 'active': activeTab === 'impact' }" @click="activeTab = 'impact'" x-show="impactContent">규제영향분석</div>
+              </div>
           </div>
 
           <!-- Content Area (Blue Deep) -->
-          <div class="flex-fill overflow-auto bg-blue-deep p-4 position-relative">
+          <div class="detail-body flex-fill overflow-auto bg-blue-deep p-4 position-relative">
                <div x-show="selectedPost && !loading">
                    <div x-show="activeTab === 'insight'" class="markdown-body" x-html="insightContent"></div>
                    <div x-show="activeTab === 'body'" class="markdown-body" x-html="bodyContent"></div>
@@ -324,6 +348,44 @@
                     this.$watch('activeFilters', () => this.filterPosts());
                     this.$watch('activeFilters.department', () => this.filterPosts());
                     this.filterPosts();
+                    this.initHeadroom();
+                },
+                
+                initHeadroom() {
+                    // Initialize Headroom only after DOM is ready
+                    setTimeout(() => {
+                        const detailHeader = document.querySelector('.detail-header');
+                        const detailBody = document.querySelector('.detail-body');
+                        const bottomNav = document.querySelector('.mobile-bottom-nav');
+                        
+                        if (detailHeader && detailBody) {
+                            const hrTop = new Headroom(detailHeader, {
+                                offset: 50,
+                                tolerance: 5,
+                                scroller: detailBody, // Attach to the content scroller
+                                classes: {
+                                    initial: "navbar-headroom",
+                                    pinned: "headroom--pinned",
+                                    unpinned: "headroom--unpinned"
+                                }
+                            });
+                            hrTop.init();
+                        }
+                        
+                        if (bottomNav && detailBody) {
+                             const hrBottom = new Headroom(bottomNav, {
+                                offset: 50,
+                                tolerance: 5,
+                                scroller: detailBody, // Shared scroller
+                                classes: {
+                                    initial: "navbar-headroom",
+                                    pinned: "headroom--pinned",
+                                    unpinned: "headroom--unpinned"
+                                }
+                            });
+                            hrBottom.init();
+                        }
+                    }, 500);
                 },
 
                 filterPosts() {
