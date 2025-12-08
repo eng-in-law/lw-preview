@@ -125,7 +125,7 @@
          <!-- Status Bar -->
          <div class="d-flex justify-content-between px-2 py-1 bg-dark border-bottom small text-muted">
             <span>총 <span x-text="filteredPosts.length"></span>건</span>
-            <span x-text="'UPDATED: 2025. 12. 08. 20:11'"></span>
+            <span x-text="'UPDATED: 2025. 12. 08. 20:16'"></span>
          </div>
 
          <!-- List -->
@@ -310,9 +310,16 @@
                 async selectPost(post) {
                     this.selectedPost = post;
                     this.loading = true;
-                    // Keep activeTab if appropriate, or reset? HTS usually keeps state.
-                    // But if new post doesn't have insight, we might be on empty tab.
-                    // Let's reset to insight and fallback if needed.
+                    
+                    // Fallback: If no content loads within 5 seconds, force stop loading
+                    const timeoutId = setTimeout(() => {
+                        if (this.loading) {
+                            console.warn('Fetch timed out');
+                            this.loading = false;
+                            this.bodyContent = '<div class="alert alert-warning rounded-0">데이터 로딩 시간이 초과되었습니다.</div>';
+                        }
+                    }, 5000);
+
                     if (!this.activeTab) this.activeTab = 'insight';
 
                     this.bodyContent = '';
@@ -326,6 +333,8 @@
                         const res = await fetch(`data/${post.id}.json`);
                         
                         
+                        clearTimeout(timeoutId); // Clear timeout on success
+
                         if (!res.ok) throw new Error('Fetch failed');
                         
                         const data = await res.json();
@@ -335,7 +344,6 @@
                         this.impactContent = data.impact;
                         this.insightContent = data.insight;
                         
-                        // Smart Tab Switching: If current tab is empty, switch to one that has content
                         if (this.activeTab === 'insight' && !this.insightContent) this.activeTab = 'body';
                         if (this.activeTab === 'impact' && !this.impactContent) this.activeTab = 'body';
                         
