@@ -190,7 +190,7 @@
                             <template x-for="field in filters.law_fields" :key="field"><option :value="field" x-text="field"></option></template>
                         </select>
                     </div>
-                    <div class="d-flex gap-1 ms-lg-auto flex-grow-1" style="min-width: 200px; flex-basis: 280px;">
+                    <div class="d-flex gap-1 ms-lg-auto" style="flex: 1 1 220px; min-width: 180px; max-width: 360px;">
                         <input type="text" x-model="searchQuery" x-ref="searchInput" class="form-control form-control-sm w-100" placeholder="법령안 내용 검색">
                         <button class="btn btn-sm btn-icon btn-dark border border-secondary" @click="$refs.searchInput.focus()">
                             <svg xmlns="http://www.w3.org/2000/svg" class="icon icon-tabler icon-tabler-search" width="16" height="16" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round"><path stroke="none" d="M0 0h24v24H0z" fill="none"/><path d="M10 10m-7 0a7 7 0 1 0 14 0a7 7 0 1 0 -14 0" /><path d="M21 21l-6 -6" /></svg>
@@ -199,7 +199,7 @@
                  </div>
              </div>
              <div class="d-flex justify-content-between align-items-center px-2 py-1 small text-secondary flex-wrap gap-2">
-                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 22:58'"></span>
+                <span class="text-secondary" x-text="'UPDATED: 2025. 12. 09. 23:08'"></span>
                 <div class="d-flex gap-2 align-items-center">
                     <span>총 <span x-text="filteredPosts.length"></span>건</span>
                     <button class="btn btn-xs btn-outline-secondary text-white rounded-0" @click="cycleImpactSort()" title="영향 정렬 토글">
